@@ -1,0 +1,11 @@
+{
+    "_id": "session_123",
+    "_username": "user_456",
+    "messages": [
+      { "role": "user", "text": "Hello" },
+      { "role": "bot", "text": "Hi! How can I help?" }
+    ],
+    "thumbnail":"Test thumbnail",
+    
+    "created_at": "2025-02-17T12:00:00Z"
+  }

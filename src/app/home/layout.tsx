@@ -39,7 +39,7 @@ export default function RootLayout({
           </nav>
 
           {/* Page Content */}
-          <div className="container mx-auto">{children}</div>
+          <div className="mx-auto w-full">{children}</div>
         </body>
       </html>
     </ClerkProvider>

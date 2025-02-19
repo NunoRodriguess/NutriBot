@@ -18,7 +18,9 @@
   "dependencies": {
     "@clerk/nextjs": "^6.11.3",
     "@t3-oss/env-nextjs": "^0.10.1",
+    "@types/mongoose": "^5.11.96",
     "geist": "^1.3.0",
+    "mongoose": "^8.10.1",
     "next": "^15.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
