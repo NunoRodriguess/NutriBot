@@ -73,7 +73,6 @@ export default function HomePage() {
     setMessage("");
 
     try {
-      // Mock API response with delay
       setTimeout(() => {
         const botResponse: Message = { role: "bot", text: "This is a mock response." };
         setActiveConversation((prev) =>
@@ -82,6 +81,21 @@ export default function HomePage() {
       }, 1000);
     } catch (error) {
       console.error("Error sending message:", error);
+    }
+  };
+
+  const handleNewConversation = async () => {
+    try {
+      /*
+      const response = await fetch("/api/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user?.id }),
+      });
+      */
+      console.log("New conversation API called");
+    } catch (error) {
+      console.error("Error creating new conversation:", error);
     }
   };
 
@@ -109,6 +123,12 @@ export default function HomePage() {
             <p className="text-gray-500">No conversations yet.</p>
           )}
         </div>
+        <button
+          onClick={handleNewConversation}
+          className="mb-4 p-2 bg-green-500 text-white rounded-lg"
+        >
+          New Conversation
+        </button>
       </div>
 
       {/* Main Content */}
