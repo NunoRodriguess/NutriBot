@@ -10,12 +10,13 @@ export interface IMessage {
 export interface IConversation {
     messages: IMessage[];
     thumbnail?: string;
-    created_at: Date;
+    created_at: Date; 
 }
 
 export interface IUser extends Document {
     _username: string;
     conversations: IConversation[];
+    user_info?: any;
 }
 
 //----------------------------------
@@ -34,7 +35,7 @@ const ConversationSchema = new Schema<IConversation>({
 const UserSchema = new Schema<IUser>({
     _username: { type: String, required: true, unique: true },
     conversations: [ConversationSchema],
-
+    user_info: { type: Schema.Types.Mixed },
 });
 
 const User = models.User || model<IUser>('User', UserSchema);
