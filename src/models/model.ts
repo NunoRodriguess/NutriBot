@@ -11,7 +11,6 @@ export interface IConversation {
     messages: IMessage[];
     thumbnail?: string;
     created_at: Date;
-    extra_info?: any; 
 }
 
 export interface IUser extends Document {
