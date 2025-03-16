@@ -30,7 +30,6 @@ const ConversationSchema = new Schema<IConversation>({
     messages: [MessageSchema],
     thumbnail: { type: String },
     created_at: { type: Date, default: Date.now },
-    extra_info: Schema.Types.Mixed,
 });
 
 const UserSchema = new Schema<IUser>({
