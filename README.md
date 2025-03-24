@@ -24,3 +24,7 @@ TBD
 ## Arquitetura
 
 TBD
+
+## Repositórios
+
+Grupo 2: https://github.com/SenseiBott/NutriBot-KnowledgeBase
