@@ -28,3 +28,4 @@ TBD
 ## Repositórios
 
 Grupo 2: https://github.com/SenseiBott/NutriBot-KnowledgeBase
+Grupo 4: https://github.com/hramos04/MD-Grupo4
