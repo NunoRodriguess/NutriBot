@@ -19,6 +19,8 @@ export interface IMessage {
 }
 
 export interface IConversation {
+    _id: string; // ObjectId
+    _username: string;
     messages: IMessage[];
     thumbnail?: string;
     created_at: Date; 

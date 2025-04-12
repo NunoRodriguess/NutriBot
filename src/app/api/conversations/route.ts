@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { IConversation } from "../../../models/Conversation";
+import { IConversation } from "../../../models/model";
 import mongoose from "mongoose";
 
 export async function GET(req: NextRequest) {
