@@ -2,25 +2,22 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { IMessage} from "~/models/Conversation";
 
-interface Message {
-  role: string;
-  text: string;
-}
-
-interface Conversation {
-  _id: string;
+export interface ClientIConversation {
+  _id: string;  // Use string instead of ObjectId for client
+  _username: string;
+  messages: IMessage[];
   thumbnail?: string;
-  messages: Message[];
+  created_at: string | Date;  // Date objects don't serialize well
 }
+
 
 export default function HomePage() {
   const { user, isLoaded } = useUser();
-  const router = useRouter();
   const [message, setMessage] = useState<string>("");
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const [conversations, setConversations] = useState<ClientIConversation[]>([]);
+  const [activeConversation, setActiveConversation] = useState<ClientIConversation | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,7 +25,7 @@ export default function HomePage() {
 
     const fetchConversations = async () => {
       try {
-        const username = user?.username || user?.firstName;
+        const username = user?.username ?? user?.firstName;
         if (!username) {
           console.error("Username is missing.");
           return;
@@ -37,12 +34,13 @@ export default function HomePage() {
         const response = await fetch(`/api/conversations?username=${encodeURIComponent(username)}`);
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-        const data = await response.json();
+        const data = (await response.json()) as ClientIConversation[];
         setConversations(data);
 
         const urlParams = new URLSearchParams(window.location.search);
         const conversationId = urlParams.get("id");
-        const initialConversation = data.find((c: { _id: string | null }) => c._id === conversationId) || data[0] || null;
+             // Safe operations (TypeScript knows `data` is IConversation[])
+        const initialConversation =  data.find((c) => c._id.toString() === conversationId) ?? data[0] ??  null;
         setActiveConversation(initialConversation);
       } catch (error) {
         console.error("Error fetching conversations:", error);
@@ -51,21 +49,23 @@ export default function HomePage() {
       }
     };
 
-    fetchConversations();
+    fetchConversations().catch((error) => {
+      console.error("Unhandled error in fetchConversations:", error);
+    });
   }, [isLoaded, user]);
 
   if (!isLoaded || loading) {
     return <p>Loading conversations...</p>;
   }
 
-  const handleSelectConversation = (conv: Conversation) => {
+  const handleSelectConversation = (conv: ClientIConversation) => {
     setActiveConversation(conv);
   };
 
   const handleSendMessage = async () => {
     if (!message.trim() || !activeConversation) return;
 
-    const newMessage: Message = { role: "user", text: message };
+    const newMessage: IMessage = { role: "user", text: message };
     setActiveConversation({
       ...activeConversation,
       messages: [...activeConversation.messages, newMessage],
@@ -74,7 +74,7 @@ export default function HomePage() {
 
     try {
       setTimeout(() => {
-        const botResponse: Message = { role: "bot", text: "This is a mock response." };
+        const botResponse: IMessage = { role: "bot", text: "This is a mock response." };
         setActiveConversation((prev) =>
           prev ? { ...prev, messages: [...prev.messages, botResponse] } : prev
         );
@@ -100,7 +100,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100 w-full">
+    <div className="flex h-screen bg-white w-full">
       {/* Sidebar */}
       <div className="w-72 shadow-lg p-4 flex flex-col bg-gray-100">
         <h2 className="text-xl font-semibold mb-4 text-center">Conversations</h2>
@@ -108,15 +108,15 @@ export default function HomePage() {
           {conversations.length > 0 ? (
             conversations.map((conv) => (
               <button
-                key={conv._id}
+                key={conv._id.toString()}
                 onClick={() => handleSelectConversation(conv)}
-                className={`w-full p-3 text-left rounded-lg transition ${
+                className={`w-full mb-2 p-3 text-left rounded-lg transition ${
                   activeConversation?._id === conv._id
                     ? "bg-green-500 text-white"
                     : "hover:bg-gray-200"
                 }`}
               >
-                {conv.thumbnail || "Conversation"}
+                {conv.thumbnail ?? "Conversation"}
               </button>
             ))
           ) : (

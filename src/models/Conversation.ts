@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, model, models } from "mongoose";
+import mongoose, { Schema, Document, model, models} from "mongoose";
 
 export interface IMessage {
   role: "user" | "bot";
@@ -6,11 +6,13 @@ export interface IMessage {
 }
 
 export interface IConversation extends Document {
+  _id: mongoose.Types.ObjectId;
   _username: string;
   messages: IMessage[];
   thumbnail?: string;
   created_at: Date;
 }
+
 
 const MessageSchema = new Schema<IMessage>({
   role: { type: String, required: true, enum: ["user", "bot"] },
@@ -25,4 +27,4 @@ const ConversationSchema = new Schema<IConversation>({
 });
 
 
-export default models.Conversation || model<IConversation>("Conversation", ConversationSchema);
+export default models.Conversation ?? model<IConversation>("Conversation", ConversationSchema);
