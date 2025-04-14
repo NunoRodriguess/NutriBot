@@ -24,3 +24,15 @@ TBD
 ## Arquitetura
 
 TBD
+
+## Repositórios
+
+Grupo 1: https://github.com/kikofallout/MD-Grupo1
+
+Grupo 2: https://github.com/SenseiBott/NutriBot-KnowledgeBase
+
+Grupo 3: https://github.com/Goncalini/Chatbot-de-Atividade-Fisica
+
+Grupo 4: https://github.com/hramos04/MD-Grupo4
+
+Grupo 5: https://github.com/miguelpinto17/MD-Grupo5
