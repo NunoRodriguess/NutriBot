@@ -2,10 +2,6 @@ from flask import Blueprint, request, jsonify
 
 profile_bp = Blueprint('profile', __name__)
 
-@profile_bp.route('/ping', methods=['GET'])
-def ping():
-    return jsonify({'message': 'pong'}), 200
-
 @profile_bp.route('/profile', methods=['POST'])
 def create_profile():
     data = request.get_json()
