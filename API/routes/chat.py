@@ -5,6 +5,20 @@ chat_bp = Blueprint('chat', __name__)
 
 conversations = {}
 
+# Get all conversations from a user, having his username
+@chat_bp.route('/chat/<username>', methods=['GET'])
+def get_conversations(username):
+    user_conversations = [conv for conv in conversations.values() if conv['username'] == username]
+    return jsonify(user_conversations), 200
+
+# Get a conversations from a user, having his username and the conversation id
+@chat_bp.route('/chat/<username>/<conversation_id>', methods=['GET'])
+def get_conversation(username, conversation_id):
+    conversation = conversations.get(conversation_id)
+    if not conversation or conversation['username'] != username:
+        return jsonify({'error': 'Conversation not found'}), 404
+    return jsonify(conversation), 200
+
 @chat_bp.route('/chat', methods=['POST'])
 def create_conversation():
     conversation_id = str(uuid.uuid4())
