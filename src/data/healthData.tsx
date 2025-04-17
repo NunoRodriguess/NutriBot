@@ -35,4 +35,10 @@ export const DISEASES = [
     "Soy",
     "Gluten",
   ];
+
+  export const DIET = [
+    "Vegan",
+    "Vegeterian",
+    "Carnivore"
+  ];
   

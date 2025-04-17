@@ -20,7 +20,6 @@ export interface IMessage {
 
 export interface IConversation {
     _id: string; // ObjectId
-    _username: string;
     messages: IMessage[];
     thumbnail?: string;
     created_at: Date; 
@@ -99,7 +98,4 @@ const UserSchema = new Schema<IUser>({
     user_info: UserInfoSchema,
 });
 
-const User = models.User || model<IUser>('User', UserSchema);
-
-export default User;
 

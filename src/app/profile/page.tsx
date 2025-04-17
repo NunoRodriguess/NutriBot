@@ -3,7 +3,8 @@
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import SearchableMultiSelect from "../../components/SearchableMultiSelect";
-import { DISEASES, MEDICATIONS, ALLERGIES } from "../../data/healthData";
+import { DISEASES, MEDICATIONS, ALLERGIES, DIET } from "../../data/healthData";
+import { IUserInfo,Categorie,categorieEnumValues} from "~/models/model";
 
 
 export default function ProfilePage() {
@@ -26,12 +27,46 @@ export default function ProfilePage() {
   const [diseases, setDiseases] = useState<string[]>([]);
   const [medications, setMedications] = useState<string[]>([]);
   const [allergies, setAllergies] = useState<string[]>([]);
+  const [diet, setDiet] = useState<string[]>([]);
 
 
   const [bmi, setBmi] = useState<number | null>(null);
   const displayName = user?.fullName ?? user?.username ?? "Your Profile";
 
   useEffect(() => {
+
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch('/api/profile');
+        if (!res.ok) throw new Error('Failed to fetch profile');
+  
+        const data = await res.json();
+        const profile: IUserInfo = data.profile;
+  
+        if (profile.age) setAge(profile.age.toString());
+        if (profile.weight) setWeight(profile.weight.toString());
+        if (profile.height) setHeight(profile.height.toString());
+        if (profile.sex) setSex(profile.sex);
+        if (profile.body_fat) setBodyFat(profile.body_fat.toString());
+        if (profile.avg_working_hours) setWorkHours(profile.avg_working_hours.toString());
+        if (profile.avg_sleep_hours) setSleepHours(profile.avg_sleep_hours.toString());
+        if (profile.imc) setBmi(profile.imc);
+        if (profile.physical_activity) setPhysicalActivity(capitalizeFirstLetter(profile.physical_activity));
+        if (profile.smoking) setSmoking(capitalizeFirstLetter(profile.smoking));
+        if (profile.alcohol_consumption) setAlcohol(capitalizeFirstLetter(profile.alcohol_consumption));
+        if (profile.diseases) setDiseases(profile.diseases);
+        if (profile.medication) setMedications(profile.medication);
+        if (profile.allergies) setAllergies(profile.allergies);
+        if (profile.diet) setDiet(profile.diet);
+        if (profile.other) setOther(profile.other);
+  
+      } catch (err) {
+        console.error('Error loading profile:', err);
+      }
+    };
+  
+    fetchProfile();
+
     const w = parseFloat(weight);
     const h = parseFloat(height);
     if (!isNaN(w) && !isNaN(h) && h > 0) {
@@ -42,31 +77,65 @@ export default function ProfilePage() {
     }
   }, [weight, height]);
 
-  const handleSave = () => {
-    const profileData = {
-      age: age.trim() === "" ? null : parseInt(age),
-      weight: weight.trim() === "" ? null : parseFloat(weight),
-      height: height.trim() === "" ? null : parseFloat(height),
-      bmi,
-      sex: sex.trim() === "" ? null : sex,
-      bodyFat: bodyFat.trim() === "" ? null : parseFloat(bodyFat),
-      workHours: workHours.trim() === "" ? null : parseFloat(workHours),
-      sleepHours: sleepHours.trim() === "" ? null : parseFloat(sleepHours),
-      other: other.trim() === "" ? null : other,
-      physicalActivity: physicalActivity || null,
-      alcoholConsumption: alcohol || null,
-      drugUse: drugs || null,
-      smoking: smoking || null,
-      diseases: diseases.length > 0 ? diseases : null,
-      medications: medications.length > 0 ? medications : null,
-      allergies: allergies.length > 0 ? allergies : null,
+
+    function capitalizeFirstLetter(str: string): string {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  const toCategorie = (value: string): Categorie | undefined => {
+    return categorieEnumValues.includes(value as Categorie)
+      ? (value as Categorie)
+      : undefined;
+  };
+
+  const handleSave = async () => {
+
+    const username = user?.username ?? user?.firstName;
+        if (!username) {
+          console.error("Username is missing.");
+          return;
+    }
+    const profileData: IUserInfo = {
+      age: age.trim() === "" ? undefined : parseInt(age),
+      weight: weight.trim() === "" ? undefined : parseFloat(weight),
+      height: height.trim() === "" ? undefined : parseFloat(height),
+      imc: bmi ?? undefined,
+      sex: sex.trim() === "" ? undefined : sex,
+      body_fat: bodyFat.trim() === "" ? undefined : parseFloat(bodyFat),
+      avg_working_hours: workHours.trim() === "" ? undefined : parseFloat(workHours),
+      avg_sleep_hours: sleepHours.trim() === "" ? undefined : parseFloat(sleepHours),
+      physical_activity: toCategorie(physicalActivity.toLowerCase()),
+      alcohol_consumption: toCategorie(alcohol.toLowerCase()),
+      smoking: toCategorie(smoking.toLowerCase()),
+      diseases: diseases.length > 0 ? diseases : undefined,
+      medication: medications.length > 0 ? medications : undefined,
+      allergies: allergies.length > 0 ? allergies : undefined,
+      diet: diet.length > 0 ? diet : undefined,
+      other: other.trim() === "" ? undefined : other,
     };
   
-    console.log("Saved profile data:", profileData);
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,  // Include username
+          profile: profileData,
+        }),
+      });
   
-    // TODO: Save to backend or database
+      if (!res.ok) {
+        throw new Error('Failed to update profile');
+      }
+  
+      const result = await res.json();
+      console.log('Profile updated successfully:', result);
+    } catch (err) {
+      console.error('Error updating profile:', err);
+    }
   };
-  
   return (
     <div className="min-h-screen bg-gray-800 text-white p-8">
       <div className="max-w-2xl mx-auto bg-gray-900 rounded-2xl p-8 shadow-2xl">
@@ -163,6 +232,13 @@ export default function ProfilePage() {
         setSelected={setAllergies}
         />
 
+        <SearchableMultiSelect
+        label="Diet"
+        options={DIET}
+        selected={diet}
+        setSelected={setDiet}
+        />
+
 
         <div className="mb-4">
           <label className="block mb-1 text-sm font-medium">Other Notes</label>
@@ -228,9 +304,9 @@ function Input({
 
 const CATEGORY_OPTIONS = [
   "Never",
-  "Rarely (1 time per month or less)",
-  "Occasionally (2–4 times per month)",
-  "Frequently (2–3 times per week)",
+  "Rarely",
+  "Occasionally",
+  "Often",
   "Daily",
 ];
 
