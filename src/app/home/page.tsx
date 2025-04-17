@@ -2,22 +2,13 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
-import { IMessage} from "~/models/Conversation";
-
-export interface ClientIConversation {
-  _id: string;  // Use string instead of ObjectId for client
-  _username: string;
-  messages: IMessage[];
-  thumbnail?: string;
-  created_at: string | Date;  // Date objects don't serialize well
-}
-
+import { IMessage, IConversation} from "~/models/model";
 
 export default function HomePage() {
   const { user, isLoaded } = useUser();
   const [message, setMessage] = useState<string>("");
-  const [conversations, setConversations] = useState<ClientIConversation[]>([]);
-  const [activeConversation, setActiveConversation] = useState<ClientIConversation | null>(null);
+  const [conversations, setConversations] = useState<IConversation[]>([]);
+  const [activeConversation, setActiveConversation] = useState<IConversation | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,7 +16,7 @@ export default function HomePage() {
 
     const fetchConversations = async () => {
       try {
-        const username = user?.username ?? user?.firstName;
+        const username = user?.username
         if (!username) {
           console.error("Username is missing.");
           return;
@@ -34,12 +25,11 @@ export default function HomePage() {
         const response = await fetch(`/api/conversations?username=${encodeURIComponent(username)}`);
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-        const data = (await response.json()) as ClientIConversation[];
+        const data = (await response.json()) as IConversation[];
         setConversations(data);
 
         const urlParams = new URLSearchParams(window.location.search);
         const conversationId = urlParams.get("id");
-             // Safe operations (TypeScript knows `data` is IConversation[])
         const initialConversation =  data.find((c) => c._id.toString() === conversationId) ?? data[0] ??  null;
         setActiveConversation(initialConversation);
       } catch (error) {
@@ -58,7 +48,7 @@ export default function HomePage() {
     return <p>Loading conversations...</p>;
   }
 
-  const handleSelectConversation = (conv: ClientIConversation) => {
+  const handleSelectConversation = (conv: IConversation) => {
     setActiveConversation(conv);
   };
 
@@ -86,14 +76,23 @@ export default function HomePage() {
 
   const handleNewConversation = async () => {
     try {
-      /*
+      const username = user?.username
+      if (!username) {
+        console.error("Username is missing.");
+        return;
+      }
       const response = await fetch("/api/conversations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user?.id }),
+        body: JSON.stringify({ username: user?.username}),
       });
-      */
-      console.log("New conversation API called");
+      
+      const data = await response.json();
+      const newConversation: IConversation = data.conversation;
+  
+      // Add to the list
+      setConversations((prev) => [newConversation, ...prev]);
+      setActiveConversation(newConversation);
     } catch (error) {
       console.error("Error creating new conversation:", error);
     }
