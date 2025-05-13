@@ -57,7 +57,7 @@ def global_agent_response(message_id):
     message = data.get('message')
     agent = data.get('agent')
     username = data.get('username')
-    msg_in_id = str(msg_id) + ";" + str(conversation_id)
+    msg_in_id = str(msg_id) + "|" + str(conversation_id)
 
     # Encontrar na fila de espera
     if msg_in_id in waiting_for_global_queue:
@@ -81,7 +81,7 @@ def global_agent_response(message_id):
             }
 
             to_ask = {
-                "id": msg_id,
+                "id": msg_in_id,
                 "prompt": message,
                 "personal_info": personal_info,
                 "last_10_msgs": last_10_msgs
@@ -101,7 +101,7 @@ def add_message(username, conversation_id):
     data = request.get_json()
     message = data.get('message')
     role = data.get('role')
-    msg_id = str(uuid.uuid4()) + ";" + str(conversation_id)
+    msg_id = str(uuid.uuid4()) + "|" + str(conversation_id)
 
     if not message or not isinstance(message, str):
         return jsonify({'error': 'Invalid message'}), 400
