@@ -10,7 +10,6 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-
 app.register_blueprint(profile_bp)
 app.register_blueprint(chat_bp)
 
