@@ -51,7 +51,7 @@ class MongoDBConnection:
             raise ValueError(f"User {username} already exists in the database.")
 
         else:
-            user_info = {"_id": username, "_email": email, "conversations": []}  # Set _id to username
+            user_info = {"_id": username, "_email": email, "personal_info": [], "conversations": []}  # Set _id to username
             
             result = collection.insert_one(user_info)
             
@@ -63,14 +63,18 @@ class MongoDBConnection:
 
     def update_profile(self, username, profile_data, collection_name="users"):
         """
-        Update the profile information for a user.
+        Update the profile information for a user inside the personal_info field.
         
         :param username: The username of the user.
         :param profile_data: A dictionary containing the profile fields to update.
         :return: The updated user profile as a dictionary.
         """
         collection = self.db[collection_name]
-        result = collection.update_one({"_id": username}, {"$set": profile_data})
+
+        result = collection.update_one(
+            {"_id": username},
+            {"$set": {f"personal_info.{key}": value for key, value in profile_data.items()}}
+        )
 
         if result.modified_count > 0:
             return self.get_user_info(username)
@@ -145,12 +149,13 @@ class MongoDBConnection:
         else:
             raise ValueError(f"Failed to create conversation for user {username}.")
 
-    def add_message_to_conversation(self, username, conversation_id, message, role, collection_name="users"):
+    def add_message_to_conversation(self, username, conversation_id, msg_id, message, role, collection_name="users"):
         """
         Add a message to an existing conversation within the user's conversations field.
         
         :param username: The username of the user.
         :param conversation_id: The ID of the conversation.
+        :param msg_id: The ID of the message.
         :param message: The message text to add.
         :param role: The role of the sender ("user" or "bot").
         :param collection_name: The name of the users collection.
@@ -164,6 +169,7 @@ class MongoDBConnection:
         new_message = {
             "role": role,
             "text": message,
+            "id": msg_id,
             "timestamp": datetime.now()
         }
 
@@ -250,3 +256,38 @@ class MongoDBConnection:
             "_id": user_info["_id"],
             "conversations": formatted_conversations
         }
+    
+    def get_data_for_question(self, username, conversation_id, collection_name="users"):
+        """
+        Retrieve the data needed for a question from a specific conversation.
+        
+        :param username: The username of the user.
+        :param conversation_id: The ID of the conversation.
+        :param collection_name: The name of the users collection.
+        :return: A dictionary containing the conversation data.
+        """
+        collection = self.db[collection_name]
+        
+        user = collection.find_one({"_id": username}, {"conversations": 1})
+        
+        if not user:
+            raise ValueError(f"User {username} not found in the database.")
+        
+        conversations = user.get("conversations", [])
+        conversation = next((conv for conv in conversations if conv.get("id") == conversation_id), None)
+        if not conversation:
+            raise ValueError(f"Conversation {conversation_id} not found for user {username}.")
+        
+        if len(conversation["messages"]) > 11: 
+            last_10_messages = conversation["messages"][-11:]
+            last_10_messages.pop(-1)
+
+        else:
+            last_10_messages = conversation["messages"]
+            last_10_messages.pop(-1)
+
+        personal_info = user.get("personal_info", [])
+
+        return personal_info, last_10_messages
+        
+    
