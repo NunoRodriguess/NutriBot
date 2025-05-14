@@ -1,0 +1,89 @@
+version: '3'
+
+services:
+  specialist-agent-group1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: specialist-agent:latest
+    container_name: specialist-agent-group1
+    environment:
+      - GROUP_NUMBER=1
+      - FLASK_PORT=3001
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    volumes:
+      - ./src/data:/app/src/data
+      - ./src/config:/app/src/config
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+
+  specialist-agent-group2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: specialist-agent-group2
+    environment:
+      - GROUP_NUMBER=2
+      - FLASK_PORT=3002
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./src/data:/app/src/data
+      - ./src/config:/app/src/config
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+
+  specialist-agent-group3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: specialist-agent-group3
+    environment:
+      - GROUP_NUMBER=3
+      - FLASK_PORT=3003
+    ports:
+      - "3003:3003"
+    volumes:
+      - ./src/data:/app/src/data
+      - ./src/config:/app/src/config
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+
+  specialist-agent-group4:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: specialist-agent-group4
+    environment:
+      - GROUP_NUMBER=4
+      - FLASK_PORT=3004
+    ports:
+      - "3004:3004"
+    volumes:
+      - ./src/data:/app/src/data
+      - ./src/config:/app/src/config
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+
+  specialist-agent-group5:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: specialist-agent-group5
+    environment:
+      - GROUP_NUMBER=5
+      - FLASK_PORT=3005
+    ports:
+      - "3005:3005"
+    volumes:
+      - ./src/data:/app/src/data
+      - ./src/config:/app/src/config
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

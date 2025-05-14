@@ -1,0 +1,57 @@
+{
+  "Group_1": {
+    "reasoningModel": false,
+    "contextPrompt": "src/config/contextPrompt_1.txt",
+    "chunkedData": "src/data/chunkedData.json",
+    "topK": 5,
+    "targetThreshold": 0.6,
+    "minimumThreshold": 0.2,
+    "maxHierarchyLevel": 3,
+    "togetherAI_API_Key": "YOUR_API_KEY",
+    "pineconeAPI_Key": "YOUR_API_KEY"
+  },
+  "Group_2": {
+    "reasoningModel": false,
+    "contextPrompt": "src/config/contextPrompt_2.txt",
+    "chunkedData": "src/data/chunkedData.json",
+    "topK": 5,
+    "targetThreshold": 0.6,
+    "minimumThreshold": 0.2,
+    "maxHierarchyLevel": 3,
+    "togetherAI_API_Key": "YOUR_API_KEY",
+    "pineconeAPI_Key": "YOUR_API_KEY"
+  },
+  "Group_3": {
+    "reasoningModel": false,
+    "contextPrompt": "src/config/contextPrompt_3.txt",
+    "chunkedData": "src/data/chunkedData.json",
+    "topK": 5,
+    "targetThreshold": 0.6,
+    "minimumThreshold": 0.2,
+    "maxHierarchyLevel": 3,
+    "togetherAI_API_Key": "YOUR_API_KEY",
+    "pineconeAPI_Key": "YOUR_API_KEY"
+  },
+    "Group_4": {
+    "reasoningModel": false,
+    "contextPrompt": "src/config/contextPrompt_4.txt",
+    "chunkedData": "src/data/chunkedData.json",
+    "topK": 5,
+    "targetThreshold": 0.6,
+    "minimumThreshold": 0.2,
+    "maxHierarchyLevel": 3,
+    "togetherAI_API_Key": "YOUR_API_KEY",
+    "pineconeAPI_Key": "YOUR_API_KEY"
+  },
+    "Group_5": {
+    "reasoningModel": false,
+    "contextPrompt": "src/config/contextPrompt_5.txt",
+    "chunkedData": "src/data/chunkedData.json",
+    "topK": 5,
+    "targetThreshold": 0.6,
+    "minimumThreshold": 0.2,
+    "maxHierarchyLevel": 3,
+    "togetherAI_API_Key": "YOUR_API_KEY",
+    "pineconeAPI_Key": "YOUR_API_KEY"
+  }
+}
