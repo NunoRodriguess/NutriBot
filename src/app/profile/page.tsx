@@ -1,109 +1,128 @@
-"use client";
+"use client"
 
-import { useUser } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
-import SearchableMultiSelect from "../../components/SearchableMultiSelect";
-import { DISEASES, MEDICATIONS, ALLERGIES, DIET } from "../../data/healthData";
-import { IUserInfo,Categorie,categorieEnumValues} from "~/models/model";
+import type React from "react"
 
+import { useUser } from "@clerk/nextjs"
+import { useEffect, useState } from "react"
+import SearchableMultiSelect from "../../components/SearchableMultiSelect"
+import { DISEASES, MEDICATIONS, ALLERGIES, DIET } from "../../data/healthData"
+import { type IUserInfo, type Categorie, categorieEnumValues } from "~/models/model"
+import {
+  User,
+  Clock,
+  Activity,
+  Droplet,
+  Heart,
+  Coffee,
+  Moon,
+  Wine,
+  Cigarette,
+  Pill,
+  AlertTriangle,
+  Apple,
+  FileText,
+  Save,
+  ArrowRight,
+  ChevronDown,
+} from "lucide-react"
 
 export default function ProfilePage() {
-  const { user } = useUser();
+  const { user } = useUser()
 
-  const [age, setAge] = useState<string>("");
-  const [weight, setWeight] = useState<string>("");
-  const [height, setHeight] = useState<string>("");
-  const [sex, setSex] = useState<string>("");
-  const [bodyFat, setBodyFat] = useState<string>("");
-  const [workHours, setWorkHours] = useState<string>("");
-  const [sleepHours, setSleepHours] = useState<string>("");
-  const [other, setOther] = useState<string>("");
+  const [age, setAge] = useState<string>("")
+  const [weight, setWeight] = useState<string>("")
+  const [height, setHeight] = useState<string>("")
+  const [sex, setSex] = useState<string>("")
+  const [bodyFat, setBodyFat] = useState<string>("")
+  const [workHours, setWorkHours] = useState<string>("")
+  const [sleepHours, setSleepHours] = useState<string>("")
+  const [other, setOther] = useState<string>("")
 
-  const [physicalActivity, setPhysicalActivity] = useState<string>("");
-  const [alcohol, setAlcohol] = useState<string>("");
-  const [drugs, setDrugs] = useState<string>("");
-  const [smoking, setSmoking] = useState<string>("");
+  const [physicalActivity, setPhysicalActivity] = useState<string>("")
+  const [alcohol, setAlcohol] = useState<string>("")
+  const [drugs, setDrugs] = useState<string>("")
+  const [smoking, setSmoking] = useState<string>("")
 
-  const [diseases, setDiseases] = useState<string[]>([]);
-  const [medications, setMedications] = useState<string[]>([]);
-  const [allergies, setAllergies] = useState<string[]>([]);
-  const [diet, setDiet] = useState<string[]>([]);
+  const [diseases, setDiseases] = useState<string[]>([])
+  const [medications, setMedications] = useState<string[]>([])
+  const [allergies, setAllergies] = useState<string[]>([])
+  const [diet, setDiet] = useState<string[]>([])
 
+  const [bmi, setBmi] = useState<number | null>(null)
+  const [activeSection, setActiveSection] = useState<string>("basic")
+  const [isSaving, setIsSaving] = useState<boolean>(false)
+  const [saveSuccess, setSaveSuccess] = useState<boolean>(false)
 
-  const [bmi, setBmi] = useState<number | null>(null);
-  const displayName = user?.fullName ?? user?.username ?? "Your Profile";
+  const displayName = user?.fullName ?? user?.username ?? "Your Profile"
 
   useEffect(() => {
-
     const fetchProfile = async () => {
       try {
-        const res = await fetch('/api/profile');
-        if (!res.ok) throw new Error('Failed to fetch profile');
-  
-        const data = await res.json();
-        const profile: IUserInfo = data.profile;
-  
-        if (profile.age) setAge(profile.age.toString());
-        if (profile.weight) setWeight(profile.weight.toString());
-        if (profile.height) setHeight(profile.height.toString());
-        if (profile.sex) setSex(profile.sex);
-        if (profile.body_fat) setBodyFat(profile.body_fat.toString());
-        if (profile.avg_working_hours) setWorkHours(profile.avg_working_hours.toString());
-        if (profile.avg_sleep_hours) setSleepHours(profile.avg_sleep_hours.toString());
-        if (profile.imc) setBmi(profile.imc);
-        if (profile.physical_activity) setPhysicalActivity(capitalizeFirstLetter(profile.physical_activity));
-        if (profile.smoking) setSmoking(capitalizeFirstLetter(profile.smoking));
-        if (profile.alcohol_consumption) setAlcohol(capitalizeFirstLetter(profile.alcohol_consumption));
-        if (profile.diseases) setDiseases(profile.diseases);
-        if (profile.medication) setMedications(profile.medication);
-        if (profile.allergies) setAllergies(profile.allergies);
-        if (profile.diet) setDiet(profile.diet);
-        if (profile.other) setOther(profile.other);
-  
+        const res = await fetch("/api/profile")
+        if (!res.ok) throw new Error("Failed to fetch profile")
+
+        const data = await res.json()
+        const profile: IUserInfo = data.profile
+
+        if (profile.age) setAge(profile.age.toString())
+        if (profile.weight) setWeight(profile.weight.toString())
+        if (profile.height) setHeight(profile.height.toString())
+        if (profile.sex) setSex(profile.sex)
+        if (profile.body_fat) setBodyFat(profile.body_fat.toString())
+        if (profile.avg_working_hours) setWorkHours(profile.avg_working_hours.toString())
+        if (profile.avg_sleep_hours) setSleepHours(profile.avg_sleep_hours.toString())
+        if (profile.imc) setBmi(profile.imc)
+        if (profile.physical_activity) setPhysicalActivity(capitalizeFirstLetter(profile.physical_activity))
+        if (profile.smoking) setSmoking(capitalizeFirstLetter(profile.smoking))
+        if (profile.alcohol_consumption) setAlcohol(capitalizeFirstLetter(profile.alcohol_consumption))
+        if (profile.diseases) setDiseases(profile.diseases)
+        if (profile.medication) setMedications(profile.medication)
+        if (profile.allergies) setAllergies(profile.allergies)
+        if (profile.diet) setDiet(profile.diet)
+        if (profile.other) setOther(profile.other)
       } catch (err) {
-        console.error('Error loading profile:', err);
+        console.error("Error loading profile:", err)
       }
-    };
-  
-    fetchProfile();
-
-    const w = parseFloat(weight);
-    const h = parseFloat(height);
-    if (!isNaN(w) && !isNaN(h) && h > 0) {
-      const calculatedBmi = w / (h * h);
-      setBmi(parseFloat(calculatedBmi.toFixed(2)));
-    } else {
-      setBmi(null);
     }
-  }, [weight, height]);
 
+    fetchProfile()
 
-    function capitalizeFirstLetter(str: string): string {
-      return str.charAt(0).toUpperCase() + str.slice(1);
+    const w = Number.parseFloat(weight)
+    const h = Number.parseFloat(height)
+    if (!isNaN(w) && !isNaN(h) && h > 0) {
+      const calculatedBmi = w / (h * h)
+      setBmi(Number.parseFloat(calculatedBmi.toFixed(2)))
+    } else {
+      setBmi(null)
+    }
+  }, [weight, height])
+
+  function capitalizeFirstLetter(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1)
   }
 
   const toCategorie = (value: string): Categorie | undefined => {
-    return categorieEnumValues.includes(value as Categorie)
-      ? (value as Categorie)
-      : undefined;
-  };
+    return categorieEnumValues.includes(value as Categorie) ? (value as Categorie) : undefined
+  }
 
   const handleSave = async () => {
-
-    const username = user?.username ?? user?.firstName;
-        if (!username) {
-          console.error("Username is missing.");
-          return;
+    const username = user?.username ?? user?.firstName
+    if (!username) {
+      console.error("Username is missing.")
+      return
     }
+
+    setIsSaving(true)
+
     const profileData: IUserInfo = {
-      age: age.trim() === "" ? undefined : parseInt(age),
-      weight: weight.trim() === "" ? undefined : parseFloat(weight),
-      height: height.trim() === "" ? undefined : parseFloat(height),
+      age: age.trim() === "" ? undefined : Number.parseInt(age),
+      weight: weight.trim() === "" ? undefined : Number.parseFloat(weight),
+      height: height.trim() === "" ? undefined : Number.parseFloat(height),
       imc: bmi ?? undefined,
       sex: sex.trim() === "" ? undefined : sex,
-      body_fat: bodyFat.trim() === "" ? undefined : parseFloat(bodyFat),
-      avg_working_hours: workHours.trim() === "" ? undefined : parseFloat(workHours),
-      avg_sleep_hours: sleepHours.trim() === "" ? undefined : parseFloat(sleepHours),
+      body_fat: bodyFat.trim() === "" ? undefined : Number.parseFloat(bodyFat),
+      avg_working_hours: workHours.trim() === "" ? undefined : Number.parseFloat(workHours),
+      avg_sleep_hours: sleepHours.trim() === "" ? undefined : Number.parseFloat(sleepHours),
       physical_activity: toCategorie(physicalActivity.toLowerCase()),
       alcohol_consumption: toCategorie(alcohol.toLowerCase()),
       smoking: toCategorie(smoking.toLowerCase()),
@@ -112,228 +131,428 @@ export default function ProfilePage() {
       allergies: allergies.length > 0 ? allergies : undefined,
       diet: diet.length > 0 ? diet : undefined,
       other: other.trim() === "" ? undefined : other,
-    };
-  
+    }
+
     try {
-      const res = await fetch('/api/profile', {
-        method: 'PUT',
+      const res = await fetch("/api/profile", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username,  // Include username
+          username,
           profile: profileData,
         }),
-      });
-  
+      })
+
       if (!res.ok) {
-        throw new Error('Failed to update profile');
+        throw new Error("Failed to update profile")
       }
-  
-      const result = await res.json();
-      console.log('Profile updated successfully:', result);
+
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 3000)
     } catch (err) {
-      console.error('Error updating profile:', err);
+      console.error("Error updating profile:", err)
+    } finally {
+      setIsSaving(false)
     }
-  };
+  }
+
+  const sections = [
+    { id: "basic", label: "Basic Info", icon: <User className="h-5 w-5" /> },
+    { id: "lifestyle", label: "Lifestyle", icon: <Activity className="h-5 w-5" /> },
+    { id: "health", label: "Health", icon: <Heart className="h-5 w-5" /> },
+    { id: "diet", label: "Diet", icon: <Apple className="h-5 w-5" /> },
+    { id: "notes", label: "Notes", icon: <FileText className="h-5 w-5" /> },
+  ]
+
   return (
-    <div className="min-h-screen bg-gray-800 text-white p-8">
-      <div className="max-w-2xl mx-auto bg-gray-900 rounded-2xl p-8 shadow-2xl">
-        <h1 className="text-center text-3xl font-bold text-green-400 mb-6">
-        <div>{`${displayName}'s Profile`}</div>
-        </h1>
-
-        <Input label="Age" value={age} setValue={setAge} type="number" />
-        <Input
-          label="Weight (kg)"
-          value={weight}
-          setValue={setWeight}
-          type="number"
-          step="0.1"
-        />
-        <Input
-          label="Height (m)"
-          value={height}
-          setValue={setHeight}
-          type="number"
-          step="0.01"
-        />
-
-        <div className="mb-4">
-          <label className="block mb-1 text-sm font-medium">Sex</label>
-          <select
-            value={sex}
-            onChange={(e) => setSex(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-          >
-            <option value="">Select (Optional)</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other / Prefer not to say</option>
-          </select>
+    <div className="min-h-screen bg-gradient-to-b from-[#023535] to-[#015958] text-[#D8FFDB] pb-20">
+      {/* Header */}
+      <div className="relative mb-8 overflow-hidden bg-[#008F8C] py-12">
+        <div className="absolute inset-0 opacity-10">
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full bg-white"
+              style={{
+                width: `${Math.random() * 10 + 5}px`,
+                height: `${Math.random() * 10 + 5}px`,
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                opacity: Math.random() * 0.5 + 0.2,
+              }}
+            />
+          ))}
         </div>
-
-        <Input
-          label="Body Fat %"
-          value={bodyFat}
-          setValue={setBodyFat}
-          type="number"
-          step="0.1"
-        />
-        <Input
-          label="Average Work Hours (per day)"
-          value={workHours}
-          setValue={setWorkHours}
-          type="number"
-          step="0.1"
-        />
-        <Input
-          label="Average Sleep Hours (per night)"
-          value={sleepHours}
-          setValue={setSleepHours}
-          type="number"
-          step="0.1"
-        />
-        <SelectField
-          label="Physical Activity"
-          value={physicalActivity}
-          setValue={setPhysicalActivity}
-        />
-        <SelectField
-          label="Alcohol Consumption"
-          value={alcohol}
-          setValue={setAlcohol}
-        />
-        <SelectField label="Drug Use" value={drugs} setValue={setDrugs} />
-        <SelectField
-          label="Smoking Tobacco"
-          value={smoking}
-          setValue={setSmoking}
-        />
-
-        <SearchableMultiSelect
-        label="Chronic Diseases"
-        options={DISEASES}
-        selected={diseases}
-        setSelected={setDiseases}
-        />
-
-        <SearchableMultiSelect
-        label="Regular Medication"
-        options={MEDICATIONS}
-        selected={medications}
-        setSelected={setMedications}
-        />
-
-        <SearchableMultiSelect
-        label="Allergies"
-        options={ALLERGIES}
-        selected={allergies}
-        setSelected={setAllergies}
-        />
-
-        <SearchableMultiSelect
-        label="Diet"
-        options={DIET}
-        selected={diet}
-        setSelected={setDiet}
-        />
-
-
-        <div className="mb-4">
-          <label className="block mb-1 text-sm font-medium">Other Notes</label>
-          <textarea
-            value={other}
-            onChange={(e) => setOther(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-            placeholder="Optional"
-            rows={4}
-          />
-        </div>
-
-        <div className="mt-6 bg-gray-800 rounded-lg p-4">
-          <p className="text-lg font-medium">
-            BMI:{" "}
-            <span className="text-green-400 font-bold">
-              {bmi ?? null ? bmi : "N/A"}
-            </span>
+        <div className="container mx-auto px-4">
+          <h1 className="text-center text-3xl font-bold text-white">{displayName}'s Nutrition Profile</h1>
+          <p className="mt-2 text-center text-[#C7FFED]/80">
+            Complete your profile to get personalized nutrition recommendations
           </p>
         </div>
+      </div>
 
-        <div className="mt-6 flex justify-center">
-            <button
+      {/* Main Content */}
+      <div className="container mx-auto px-4">
+        <div className="mx-auto max-w-4xl rounded-xl bg-[#023535]/80 shadow-xl backdrop-blur-sm">
+          {/* Section Tabs */}
+          <div className="flex flex-wrap border-b border-[#015958]/30 px-2">
+            {sections.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id)}
+                className={`flex items-center px-4 py-3 text-sm font-medium transition-colors ${
+                  activeSection === section.id
+                    ? "border-b-2 border-[#C7FFED] text-[#C7FFED]"
+                    : "text-[#D8FFDB]/70 hover:text-[#D8FFDB]"
+                }`}
+              >
+                <span className="mr-2">{section.icon}</span>
+                {section.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Form Content */}
+          <div className="p-6">
+            {/* Basic Info Section */}
+            {activeSection === "basic" && (
+              <div className="space-y-6">
+                <h2 className="flex items-center text-xl font-semibold text-[#C7FFED]">
+                  <User className="mr-2 h-5 w-5" />
+                  Basic Information
+                </h2>
+
+                <div className="grid gap-6 md:grid-cols-2">
+                  <FormInput
+                    label="Age"
+                    value={age}
+                    onChange={setAge}
+                    type="number"
+                    icon={<Clock className="h-5 w-5 text-[#C7FFED]" />}
+                  />
+
+                  <div className="space-y-2">
+                    <label className="flex items-center text-sm font-medium text-[#D8FFDB]">
+                      <User className="mr-2 h-5 w-5 text-[#C7FFED]" />
+                      Sex
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={sex}
+                        onChange={(e) => setSex(e.target.value)}
+                        className="w-full appearance-none rounded-lg border border-[#008F8C]/30 bg-[#015958]/30 px-4 py-3 pr-10 text-[#D8FFDB] focus:border-[#008F8C] focus:outline-none focus:ring-1 focus:ring-[#008F8C]"
+                      >
+                        <option value="">Select (Optional)</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other / Prefer not to say</option>
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#C7FFED]" />
+                    </div>
+                  </div>
+
+                  <FormInput
+                    label="Weight (kg)"
+                    value={weight}
+                    onChange={setWeight}
+                    type="number"
+                    step="0.1"
+                    icon={<Activity className="h-5 w-5 text-[#C7FFED]" />}
+                  />
+
+                  <FormInput
+                    label="Height (m)"
+                    value={height}
+                    onChange={setHeight}
+                    type="number"
+                    step="0.01"
+                    icon={<ArrowRight className="h-5 w-5 text-[#C7FFED] rotate-90" />}
+                  />
+
+                  <FormInput
+                    label="Body Fat %"
+                    value={bodyFat}
+                    onChange={setBodyFat}
+                    type="number"
+                    step="0.1"
+                    icon={<Droplet className="h-5 w-5 text-[#C7FFED]" />}
+                  />
+
+                  {/* BMI Card */}
+                  <div className="rounded-lg border border-[#008F8C]/30 bg-[#015958]/30 p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-sm font-medium text-[#D8FFDB]">Body Mass Index (BMI)</h3>
+                        <p className="text-xs text-[#D8FFDB]/70">Based on your height and weight</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-[#C7FFED]">{bmi ? bmi.toFixed(1) : "—"}</p>
+                        <p className="text-xs text-[#D8FFDB]/70">
+                          {bmi
+                            ? bmi < 18.5
+                              ? "Underweight"
+                              : bmi < 25
+                                ? "Normal weight"
+                                : bmi < 30
+                                  ? "Overweight"
+                                  : "Obese"
+                            : "Enter height & weight"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Lifestyle Section */}
+            {activeSection === "lifestyle" && (
+              <div className="space-y-6">
+                <h2 className="flex items-center text-xl font-semibold text-[#C7FFED]">
+                  <Activity className="mr-2 h-5 w-5" />
+                  Lifestyle Information
+                </h2>
+
+                <div className="grid gap-6 md:grid-cols-2">
+                  <FormInput
+                    label="Average Work Hours (per day)"
+                    value={workHours}
+                    onChange={setWorkHours}
+                    type="number"
+                    step="0.1"
+                    icon={<Coffee className="h-5 w-5 text-[#C7FFED]" />}
+                  />
+
+                  <FormInput
+                    label="Average Sleep Hours (per night)"
+                    value={sleepHours}
+                    onChange={setSleepHours}
+                    type="number"
+                    step="0.1"
+                    icon={<Moon className="h-5 w-5 text-[#C7FFED]" />}
+                  />
+
+                  <FormSelect
+                    label="Physical Activity"
+                    value={physicalActivity}
+                    onChange={setPhysicalActivity}
+                    icon={<Activity className="h-5 w-5 text-[#C7FFED]" />}
+                  />
+
+                  <FormSelect
+                    label="Alcohol Consumption"
+                    value={alcohol}
+                    onChange={setAlcohol}
+                    icon={<Wine className="h-5 w-5 text-[#C7FFED]" />}
+                  />
+
+                  <FormSelect
+                    label="Drug Use"
+                    value={drugs}
+                    onChange={setDrugs}
+                    icon={<Pill className="h-5 w-5 text-[#C7FFED]" />}
+                  />
+
+                  <FormSelect
+                    label="Smoking Tobacco"
+                    value={smoking}
+                    onChange={setSmoking}
+                    icon={<Cigarette className="h-5 w-5 text-[#C7FFED]" />}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Health Section */}
+            {activeSection === "health" && (
+              <div className="space-y-6">
+                <h2 className="flex items-center text-xl font-semibold text-[#C7FFED]">
+                  <Heart className="mr-2 h-5 w-5" />
+                  Health Information
+                </h2>
+
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="flex items-center text-sm font-medium text-[#D8FFDB]">
+                      <Heart className="mr-2 h-5 w-5 text-[#C7FFED]" />
+                      Chronic Diseases
+                    </label>
+                    <SearchableMultiSelect
+                      label="Chronic Diseases"
+                      options={DISEASES}
+                      selected={diseases}
+                      setSelected={setDiseases}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="flex items-center text-sm font-medium text-[#D8FFDB]">
+                      <Pill className="mr-2 h-5 w-5 text-[#C7FFED]" />
+                      Regular Medication
+                    </label>
+                    <SearchableMultiSelect
+                      label="Regular Medication"
+                      options={MEDICATIONS}
+                      selected={medications}
+                      setSelected={setMedications}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="flex items-center text-sm font-medium text-[#D8FFDB]">
+                      <AlertTriangle className="mr-2 h-5 w-5 text-[#C7FFED]" />
+                      Allergies
+                    </label>
+                    <SearchableMultiSelect
+                      label="Allergies"
+                      options={ALLERGIES}
+                      selected={allergies}
+                      setSelected={setAllergies}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Diet Section */}
+            {activeSection === "diet" && (
+              <div className="space-y-6">
+                <h2 className="flex items-center text-xl font-semibold text-[#C7FFED]">
+                  <Apple className="mr-2 h-5 w-5" />
+                  Diet Information
+                </h2>
+
+                <div className="space-y-2">
+                  <label className="flex items-center text-sm font-medium text-[#D8FFDB]">
+                    <Apple className="mr-2 h-5 w-5 text-[#C7FFED]" />
+                    Diet Preferences
+                  </label>
+                  <SearchableMultiSelect label="Diet" options={DIET} selected={diet} setSelected={setDiet} />
+                </div>
+              </div>
+            )}
+
+            {/* Notes Section */}
+            {activeSection === "notes" && (
+              <div className="space-y-6">
+                <h2 className="flex items-center text-xl font-semibold text-[#C7FFED]">
+                  <FileText className="mr-2 h-5 w-5" />
+                  Additional Notes
+                </h2>
+
+                <div className="space-y-2">
+                  <label className="flex items-center text-sm font-medium text-[#D8FFDB]">
+                    <FileText className="mr-2 h-5 w-5 text-[#C7FFED]" />
+                    Other Health Information
+                  </label>
+                  <textarea
+                    value={other}
+                    onChange={(e) => setOther(e.target.value)}
+                    className="w-full rounded-lg border border-[#008F8C]/30 bg-[#015958]/30 px-4 py-3 text-[#D8FFDB] placeholder-[#D8FFDB]/50 focus:border-[#008F8C] focus:outline-none focus:ring-1 focus:ring-[#008F8C]"
+                    placeholder="Any other health information you'd like to share..."
+                    rows={6}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Save Button */}
+            <div className="mt-8 flex items-center justify-between">
+              <div>{saveSuccess && <p className="text-sm text-[#C7FFED]">Profile saved successfully!</p>}</div>
+              <button
                 onClick={handleSave}
-                className="px-6 py-2 bg-green-500 hover:bg-green-600 rounded-lg transition"
-            >
-                Save
-            </button>
+                disabled={isSaving}
+                className="flex items-center rounded-lg bg-[#008F8C] px-6 py-3 font-medium text-white transition-colors hover:bg-[#008F8C]/80 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isSaving ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-5 w-5" />
+                    Save Profile
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
-
       </div>
     </div>
-  );
+  )
 }
 
-function Input({
+function FormInput({
   label,
   value,
-  setValue,
+  onChange,
   type = "text",
   step,
+  icon,
 }: {
-  label: string;
-  value: string;
-  setValue: (val: string) => void;
-  type?: string;
-  step?: string;
+  label: string
+  value: string
+  onChange: (val: string) => void
+  type?: string
+  step?: string
+  icon?: React.ReactNode
 }) {
   return (
-    <div className="mb-4">
-      <label className="block mb-1 text-sm font-medium">{label}</label>
+    <div className="space-y-2">
+      <label className="flex items-center text-sm font-medium text-[#D8FFDB]">
+        {icon}
+        {label}
+      </label>
       <input
         type={type}
         value={value}
-        onChange={(e) => setValue(e.target.value)}
-        className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-lg border border-[#008F8C]/30 bg-[#015958]/30 px-4 py-3 text-[#D8FFDB] placeholder-[#D8FFDB]/50 focus:border-[#008F8C] focus:outline-none focus:ring-1 focus:ring-[#008F8C]"
         placeholder="Optional"
         step={step}
       />
     </div>
-  );
+  )
 }
 
-const CATEGORY_OPTIONS = [
-  "Never",
-  "Rarely",
-  "Occasionally",
-  "Often",
-  "Daily",
-];
+const CATEGORY_OPTIONS = ["Never", "Rarely", "Occasionally", "Often", "Daily"]
 
-function SelectField({
+function FormSelect({
   label,
   value,
-  setValue,
+  onChange,
+  icon,
 }: {
-  label: string;
-  value: string;
-  setValue: (val: string) => void;
+  label: string
+  value: string
+  onChange: (val: string) => void
+  icon?: React.ReactNode
 }) {
   return (
-    <div className="mb-4">
-      <label className="block mb-1 text-sm font-medium">{label}</label>
-      <select
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-      >
-        <option value="">Select (Optional)</option>
-        {CATEGORY_OPTIONS.map((option) => (
-          <option key={option} value={option.split(" ")[0]}>
-            {option}
-          </option>
-        ))}
-      </select>
+    <div className="space-y-2">
+      <label className="flex items-center text-sm font-medium text-[#D8FFDB]">
+        {icon}
+        {label}
+      </label>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full appearance-none rounded-lg border border-[#008F8C]/30 bg-[#015958]/30 px-4 py-3 pr-10 text-[#D8FFDB] focus:border-[#008F8C] focus:outline-none focus:ring-1 focus:ring-[#008F8C]"
+        >
+          <option value="">Select (Optional)</option>
+          {CATEGORY_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#C7FFED]" />
+      </div>
     </div>
-  );
+  )
 }
