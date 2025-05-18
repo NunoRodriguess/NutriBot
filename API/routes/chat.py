@@ -49,6 +49,23 @@ def create_conversation():
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
     
+@chat_bp.route('/llmresponse', methods=['POST'])
+def llm_response():
+    data = request.get_json()
+    username = data.get('username')
+    conversation_id = data.get('conversation_id')
+    msg_id = str(uuid.uuid4())
+    response = data.get('response')
+
+    if not username or not conversation_id or not response:
+        return jsonify({'error': 'Invalid data'}), 400
+    
+    try:
+        updated_conversation = db.add_message_to_conversation(username, conversation_id, msg_id, response, "bot")
+        return jsonify({'message': 'Response added', 'conversation': updated_conversation}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 404
+    
 @chat_bp.route('/globalresponse', methods=['POST'])
 def global_agent_response(message_id):
     data = request.get_json()
@@ -65,15 +82,15 @@ def global_agent_response(message_id):
         try:
             personal_info, last_10_msgs = db.get_data_for_question(username, conversation_id)
             if agent == "nutrition":
-                route = nutrition_api + "/nutrition"
+                route = nutrition_api
             elif agent == "supplements":
-                route = supplements_api + "/supplements"
+                route = supplements_api
             elif agent == "exercise":
-                route = physical_api + "/physical"
+                route = physical_api
             elif agent == "habits":
-                route = others_api + "/others"
+                route = others_api
             elif agent == "monitoring":
-                route = checkup_api + "/checkup"
+                route = checkup_api
 
 
             headers = {
@@ -81,7 +98,8 @@ def global_agent_response(message_id):
             }
 
             to_ask = {
-                "id": msg_in_id,
+                "id": conversation_id,
+                "username": username,
                 "prompt": message,
                 "personal_info": personal_info,
                 "last_10_msgs": last_10_msgs
@@ -95,6 +113,8 @@ def global_agent_response(message_id):
 
     else:
         return jsonify({'error': 'Message not found in waiting queue'}), 404
+    
+
 
 @chat_bp.route('/chat/<username>/<conversation_id>', methods=['PUT'])
 def add_message(username, conversation_id):
