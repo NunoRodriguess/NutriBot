@@ -1,39 +1,9 @@
-from LLMClient import LLMClient
-import pandas as pd
-import time
+from src.LLMClient import LLMClient
 
-def create_classification_prompt(agents, question):
-        # List all available topics with descriptions
-        agents_list = "\n".join([
-            f"- {agent_id}: {data['name']} - {data['description']}"
-            for agent_id, data in agents.items()
-        ])
-        
-        # Create a prompt that instructs the LLM to classify the question
-        prompt = f"""You are a classification system that determines which specialized agent should handle a given question.
-
-Available agents:
-{agents_list}
-
-Instructions:
-1. Analyze the question carefully
-2. Determine which agent topic best matches the question
-3. This step is extremely important: Your answer needs to be a SINGLE word. You can ONLY return one of the following options, without any explanation!
-- nutrition
-- supplements
-- exercise
-- habits
-- monitoring
-
-Question: {question} 
-Topic:"""
-        
-        return prompt
-        
-def main():
-    llm_client = LLMClient()
-
-    agents = {
+class AgentClassifier:
+    def __init__(self):
+        self.llm_client = LLMClient()
+        self.agents = {
             "nutrition": {
                 "name": "Nutritional Agent",
                 "description": "Handles nutrition and food related questions"
@@ -52,48 +22,67 @@ def main():
             },
             "monitoring": {
                 "name": "Monitoring Agent",
-                "description": "Handles medical monoroting and questions about preventive medicine"
+                "description": "Handles medical monitoring and questions about preventive medicine"
             },
-            
         }
+
+    def create_classification_prompt(self, question):
+        # List all available topics with descriptions
+        agents_list = "\n".join([
+            f"- {agent_id}: {data['name']} - {data['description']}"
+            for agent_id, data in self.agents.items()
+        ])
+        
+        # Create a prompt that instructs the LLM to classify the question
+        prompt = f"""You are a classification system that determines which specialized agent should handle a given question.
+Available agents:
+{agents_list}
+Instructions:
+1. Analyze the question carefully
+2. Determine which agent topic best matches the question
+3. This step is extremely important: Your answer needs to be a SINGLE word. You can ONLY return one of the following options, without any explanation!
+- nutrition
+- supplements
+- exercise
+- habits
+- monitoring
+Question: {question} 
+Topic:"""
+        
+        return prompt
+
+    def classify_message(self, message):
+        """
+        Classify a message to determine which agent should handle it.
+        
+        Args:
+            message (str): The user's message to classify
+            
+        Returns:
+            str: The agent type (nutrition, supplements, exercise, habits, or monitoring)
+        """
+        classification_prompt = self.create_classification_prompt(message)
+        llm_response = self.llm_client.generateResponse(classification_prompt)
+        
+        # Extract the agent from the response and ensure it's valid
+        agent = llm_response.strip().lower()
+        if agent not in self.agents:
+            # Default to nutrition if the agent is not recognized
+            agent = "nutrition"
+            
+        return agent
+
+def main():
+    classifier = AgentClassifier()
     
-    # Input version
-    
+    # Interactive test mode
     while True:
         question = input("\nAsk a question (or 'EXIT' to quit): ")
         if question.strip().upper() == "EXIT":
             break
-
-        question = create_classification_prompt(agents, question)
-        response = llm_client.generateResponse(question)
-        agent = response.strip().lower()
-
+        
+        agent = classifier.classify_message(question)
         print(f"Agent: {agent}")
-    
-    
-    # Test version
-    '''
-    test_file = pd.read_csv('test/test_questions.csv')
-    correct_count = 0
-    for i,r in test_file.iterrows():
-        print('Question being analyzed')
-        time.sleep(1)
-        question = r['question']
-        agent = r['agent']
-
-        q = create_classification_prompt(agents, question)
-        response = llm_client.generateResponse(q)
-        chosen_agent = response.strip().lower()
-
-        if chosen_agent == agent:
-             correct_count += 1
-        else:
-             print(f"Failed on question: {question}\nCorrect agent: {agent} || Chosen Agent: {chosen_agent}")
-
-    print(f"Correct agent picked {correct_count} out of 60 times!")
-    # 55/60
-    '''
-
 
 if __name__ == "__main__":
     main()
