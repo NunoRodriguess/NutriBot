@@ -1,0 +1,19 @@
+services:
+  global-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3006:3006"
+    environment:
+      - PORT=3006
+      - API_KEY=${API_KEY}
+    env_file:
+      - .env
+    volumes:
+      # Mount source code for development (optional - remove for production)
+      - .:/app
+      # Exclude node_modules and __pycache__
+      - /app/__pycache__
+    restart: unless-stopped
+    container_name: global-agent

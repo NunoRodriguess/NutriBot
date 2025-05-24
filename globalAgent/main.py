@@ -13,4 +13,4 @@ app.register_blueprint(global_agent_bp)
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 3006))
-    app.run(port=port)
+    app.run(host='0.0.0.0', port=port)
