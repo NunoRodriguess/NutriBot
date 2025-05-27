@@ -10,11 +10,7 @@ class Agent:
     
     def __init__(self, groupNumber):
         load_dotenv()
-        
-        globalOrchestratorAPIPort = os.getenv("GLOBAL_ORCHESTRATOR_API_PORT")
-        if not globalOrchestratorAPIPort:
-            raise ValueError("GLOBAL_ORCHESTRATOR_BASE_URL environment variable not set.")
-        self.globalOrchestratorEndpoint = f"http://localhost:{globalOrchestratorAPIPort}/reply"
+        self.globalOrchestratorEndpoint = "http://localhost:5000/reply" 
         
         self.groupConfig = loadGroupConfig("src/config/groupConfig.json", f"Group_{groupNumber}")
         

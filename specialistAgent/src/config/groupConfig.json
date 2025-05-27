@@ -14,23 +14,23 @@
     "reasoningModel": false,
     "contextPrompt": "src/config/contextPrompt_2.txt",
     "chunkedData": "src/data/chunkedData.json",
-    "topK": 5,
-    "targetThreshold": 0.6,
+    "topK": 4,
+    "targetThreshold": 0.5,
     "minimumThreshold": 0.2,
-    "maxHierarchyLevel": 3,
-    "togetherAI_API_Key": "YOUR_API_KEY",
-    "pineconeAPI_Key": "YOUR_API_KEY"
+    "maxHierarchyLevel": 2,
+    "togetherAI_API_Key": "9be08b1b81c602ad7672b5d913439b3e9fce712a460d6a056c3bcc9db7f1d3e3",
+    "pineconeAPI_Key": "pcsk_6qf8kj_9w61ctrpQNzrNVadceiUsV5sW2cbnTv9qLw9H4n14B1sgWyDxpmZComrJCsWNLu"
   },
   "Group_3": {
     "reasoningModel": false,
     "contextPrompt": "src/config/contextPrompt_3.txt",
     "chunkedData": "src/data/chunkedData.json",
     "topK": 5,
-    "targetThreshold": 0.6,
-    "minimumThreshold": 0.2,
+    "targetThreshold": 0.49,
+    "minimumThreshold": 0.3,
     "maxHierarchyLevel": 3,
-    "togetherAI_API_Key": "YOUR_API_KEY",
-    "pineconeAPI_Key": "YOUR_API_KEY"
+    "togetherAI_API_Key": "95e2342e7f0a28d3094919ebf052fe08ec7ad6f9de5d44319fb90d63fc07ce63",
+    "pineconeAPI_Key": "pcsk_5Up8i1_NRFk78MknBSJayFiU9AnkFMNxiVLEPMg4GvWQZcQLHn1oW1CmQ2JxsotFFegRvH"
   },
     "Group_4": {
     "reasoningModel": false,
@@ -40,8 +40,8 @@
     "targetThreshold": 0.6,
     "minimumThreshold": 0.2,
     "maxHierarchyLevel": 3,
-    "togetherAI_API_Key": "YOUR_API_KEY",
-    "pineconeAPI_Key": "YOUR_API_KEY"
+    "togetherAI_API_Key": "c3b3e7873b7356aea2cfd7b7f31d227ea081452da2d627871a6d594f3e869d68",
+    "pineconeAPI_Key": "pcsk_Fw7HS_EtNctbd9wgwNa9NHENkTx5kfsTvYxPjftLxuSuTUEa2Tqg55mPESfjcnmRpY69G"
   },
     "Group_5": {
     "reasoningModel": false,
