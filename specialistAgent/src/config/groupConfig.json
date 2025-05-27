@@ -3,10 +3,10 @@
     "reasoningModel": false,
     "contextPrompt": "src/config/contextPrompt_1.txt",
     "chunkedData": "src/data/chunkedData.json",
-    "topK": 5,
+    "topK": 10,
     "targetThreshold": 0.6,
     "minimumThreshold": 0.2,
-    "maxHierarchyLevel": 3
+    "maxHierarchyLevel": 4
   },
   "Group_2": {
     "reasoningModel": false,
