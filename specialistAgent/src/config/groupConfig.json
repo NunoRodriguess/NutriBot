@@ -42,6 +42,6 @@
     "topK": 5,
     "targetThreshold": 0.6,
     "minimumThreshold": 0.2,
-    "maxHierarchyLevel": 3
+    "maxHierarchyLevel": 2
   }
 }
