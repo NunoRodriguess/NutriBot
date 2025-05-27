@@ -10,20 +10,28 @@ class Agent:
     
     def __init__(self, groupNumber):
         load_dotenv()
+        
+        PINECONE_API_KEY = os.getenv(f"Group_{groupNumber}-PINECONE_API_KEY")
+        TOGETHER_AI_API_KEY = os.getenv(f"Group_{groupNumber}-TOGETHER_AI_API_KEY")
+        if not PINECONE_API_KEY:
+            raise ValueError(f"Missing environment variable: Group_{groupNumber}-PINECONE_API_KEY")
+
+        if not TOGETHER_AI_API_KEY:
+            raise ValueError(f"Missing environment variable: Group_{groupNumber}-TOGETHER_AI_API_KEY")
+        
+                
         self.globalOrchestratorEndpoint = "http://localhost:5000/reply" 
-        
         self.groupConfig = loadGroupConfig("src/config/groupConfig.json", f"Group_{groupNumber}")
-        
         self.contextPrompt = loadInitialPrompt(self.groupConfig["contextPrompt"])
-        
-        self.pineconeHandler = PineconeHandler(self.groupConfig["pineconeAPI_Key"],
+                    
+        self.pineconeHandler = PineconeHandler(PINECONE_API_KEY,
                                                self.groupConfig["chunkedData"],
                                                self.groupConfig["topK"],
                                                self.groupConfig["targetThreshold"],
                                                self.groupConfig["minimumThreshold"],
                                                self.groupConfig["maxHierarchyLevel"])
 
-        self.llmClient = LLMClient(self.groupConfig["togetherAI_API_Key"],
+        self.llmClient = LLMClient(TOGETHER_AI_API_KEY,
                                    self.groupConfig["reasoningModel"])
         
         # Create a queue and start a worker thread

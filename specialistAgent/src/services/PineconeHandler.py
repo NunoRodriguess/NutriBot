@@ -38,8 +38,6 @@ class PineconeHandler:
                 spec=ServerlessSpec(cloud="aws", region="us-east-1")
             )
             created = True
-        else:
-            print("Index already exists.")
 
         return self.pc.Index(self.indexName), created
 

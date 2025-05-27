@@ -14,6 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy source code and env file
 COPY src/ ./src/
+COPY .env ./
 
 # Set Python and Flask environment variables
 ENV PYTHONPATH="/app:${PYTHONPATH}"

@@ -1,0 +1,47 @@
+{
+  "Group_1": {
+    "reasoningModel": false,
+    "contextPrompt": "src/config/contextPrompt_1.txt",
+    "chunkedData": "src/data/chunkedData.json",
+    "topK": 5,
+    "targetThreshold": 0.6,
+    "minimumThreshold": 0.2,
+    "maxHierarchyLevel": 3
+  },
+  "Group_2": {
+    "reasoningModel": false,
+    "contextPrompt": "src/config/contextPrompt_2.txt",
+    "chunkedData": "src/data/chunkedData.json",
+    "topK": 4,
+    "targetThreshold": 0.5,
+    "minimumThreshold": 0.2,
+    "maxHierarchyLevel": 2
+  },
+  "Group_3": {
+    "reasoningModel": false,
+    "contextPrompt": "src/config/contextPrompt_3.txt",
+    "chunkedData": "src/data/chunkedData.json",
+    "topK": 5,
+    "targetThreshold": 0.49,
+    "minimumThreshold": 0.3,
+    "maxHierarchyLevel": 3
+  },
+  "Group_4": {
+    "reasoningModel": false,
+    "contextPrompt": "src/config/contextPrompt_4.txt",
+    "chunkedData": "src/data/chunkedData.json",
+    "topK": 5,
+    "targetThreshold": 0.6,
+    "minimumThreshold": 0.2,
+    "maxHierarchyLevel": 3
+  },
+  "Group_5": {
+    "reasoningModel": false,
+    "contextPrompt": "src/config/contextPrompt_5.txt",
+    "chunkedData": "src/data/chunkedData.json",
+    "topK": 5,
+    "targetThreshold": 0.6,
+    "minimumThreshold": 0.2,
+    "maxHierarchyLevel": 3
+  }
+}
