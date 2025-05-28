@@ -31,7 +31,7 @@ def formatUserInformation(userInformation: dict) -> str:
 def sendWebhook(endpoint, content):
     try:
         # Sending POST request to the endpoint with content
-        response = requests.post(endpoint, json=content)
+        response = requests.put(endpoint, json=content)
 
         # Check if the request was successful
         if response.status_code == 200:
