@@ -8,4 +8,4 @@ class Message(BaseModel):
 
 class UserModel(BaseModel):
     conversation: List[Message]
-    preferences: Dict[str, Any]
+    personal_info: Dict[str, Any]

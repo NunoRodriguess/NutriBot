@@ -7,14 +7,14 @@ def askQuestionToSpecialistAgent(app, prefix, specialistAgent):
     @app.route(f"{prefix}", methods=["POST"])
     def askQuestion():
         data = request.get_json()
-        requestId = data.get("requestId")
+        conversation_id = data.get("conversation_id")
+        username = data.get("username")
         user = data.get("user")
         prompt = data.get("prompt")
 
         # Verify requestId, user and prompt fields
-        if not requestId or not isinstance(user, dict) or not prompt:
+        if not conversation_id or not username or not isinstance(user, dict) or not prompt:
             return jsonify({
-                "requestId": requestId,
                 "error": "Missing requestId, user or prompt fields."
             }), 400
         
@@ -23,21 +23,12 @@ def askQuestionToSpecialistAgent(app, prefix, specialistAgent):
             UserModel(**user)
         except ValidationError as e:
             return jsonify({
-                "requestId": requestId,
                 "error": "Invalid user schema."
             }), 400
-            
-        try:
-            specialistAgent.handleRequest(requestId, user, prompt)
-        except Exception as e:
-            return jsonify({
-                "requestId": requestId,
-                "error": str(e)
-            }), 500
-            
-        
+
+        specialistAgent.handleRequest(conversation_id, username, user, prompt)
+
         return jsonify({
-            "requestId": requestId,
             "message": "Request received successfully."
         }), 200
        

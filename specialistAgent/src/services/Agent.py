@@ -43,11 +43,11 @@ class Agent:
     def _processQueue(self):
         while True:
             try:
-                requestId, user, prompt = self.taskQueue.get()
-                print(f"[Worker] Processing request {requestId}")
+                conversation_id, username, user, prompt = self.taskQueue.get()
+                print(f"[Worker] Processing request {conversation_id}-{username}")
                 
                 response = self.submitQuestion(prompt, user)
-                print(f"[Worker] Response for {requestId}: {response}")
+                print(f"[Worker] Response for {conversation_id}-{username}: {response}")
                 
                 # sendWebhook(self.globalOrchestratorEndpoint, {
                 #     "requestId": requestId,
@@ -55,7 +55,7 @@ class Agent:
                 # })
                 
             except Exception as error:
-                print(f"[Worker] Error handling request {requestId}: {error}")
+                print(f"[Worker] Error handling request {conversation_id}-{username}: {error}")
                 
                 # sendWebhook(self.globalOrchestratorEndpoint, {
                 #     "requestId": requestId,
@@ -66,9 +66,9 @@ class Agent:
                 self.taskQueue.task_done()
                 
     
-    def handleRequest(self, requestId, user, prompt):
-        self.taskQueue.put((requestId, user, prompt))
-        print(f"Task added to queue for request {requestId}")
+    def handleRequest(self, conversation_id, username, user, prompt):
+        self.taskQueue.put((conversation_id, username, user, prompt))
+        print(f"Task added to queue for request {conversation_id}-{username}")
         
         
     def submitQuestion(self, prompt, user):
@@ -77,7 +77,7 @@ class Agent:
         if context == "":
             raise Exception("The articles does not provide enough information to answer completely.")
         
-        userInformation = user["preferences"]
+        userInformation = user["personal_info"]
         userHistory = user["conversation"]
         
         promptWithoutUserHistory = formatPrompt(self.contextPrompt, prompt, context, userInformation)   

@@ -8,7 +8,8 @@ load_dotenv()
 groupNumber = os.environ.get('GROUP_NUMBER', 4) # Changed based on your group number
 agent = Agent(groupNumber)
 
-requestId = "123-242123-3213213"
+conversation_id = "123-242123-3213213"
+username = "nome"
 user = {
     "conversation": [
         {
@@ -24,14 +25,14 @@ user = {
             "text": "Good sleep is essential for our health and emotional well-being."
         }
     ],
-    "preferences": {
+    "personal_info": {
         "age": 23,
         "health": "good"
     }
 }
-prompt = "How many hours of sleep should I get?"
+prompt = "What are the risks of mixing alcohol with prescription or illegal drugs?"
 
-agent.handleRequest(requestId, user, prompt)
+agent.handleRequest(conversation_id, username, user, prompt)
 
 while True:
     time.sleep(100)
