@@ -268,7 +268,7 @@ class MongoDBConnection:
         """
         collection = self.db[collection_name]
         
-        user = collection.find_one({"_id": username}, {"conversations": 1})
+        user = collection.find_one({"_id": username}, {"conversations": 1, "personal_info": 1})
         
         if not user:
             raise ValueError(f"User {username} not found in the database.")
@@ -286,7 +286,7 @@ class MongoDBConnection:
             last_10_messages = conversation["messages"]
             last_10_messages.pop(-1)
 
-        personal_info = user.get("personal_info", [])
+        personal_info = user.get("personal_info", {})
 
         return personal_info, last_10_messages
         

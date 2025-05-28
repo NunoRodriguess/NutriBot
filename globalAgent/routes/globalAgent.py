@@ -1,8 +1,14 @@
 from flask import Blueprint, request, jsonify
 from src.main import AgentClassifier
+import requests
+from dotenv import load_dotenv
+import os
 
 # Create global_agent blueprint
 global_agent_bp = Blueprint('global_agent', __name__)
+
+load_dotenv()
+api_route = os.getenv('API_URL', 'http://localhost:4000/globalresponse')
 
 # Initialize the classifier
 classifier = AgentClassifier()
@@ -37,4 +43,15 @@ def route_message():
         "username": username
     }
     
-    return jsonify(response_data), 200
+    headers = {'Content-Type': 'application/json'}
+
+    try:
+        # Send the response to the API route
+        response = requests.post(api_route, json=response_data, headers=headers)
+        
+        if response.status_code == 200:
+            return jsonify({"message": "Message routed successfully", "data": response_data}), 200
+        else:
+            return jsonify({"error": "Failed to route message", "details": response.text}), response.status_code
+    except requests.RequestException as e:
+        return jsonify({"error": "Request to API failed", "details": str(e)}), 500

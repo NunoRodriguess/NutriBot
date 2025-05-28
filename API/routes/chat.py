@@ -64,20 +64,22 @@ def llm_response():
         return jsonify({'error': str(e)}), 404
     
 @chat_bp.route('/globalresponse', methods=['POST'])
-def global_agent_response(message_id):
+def global_agent_response():
     data = request.get_json()
-    msg_id = data.get('id')
+    msg_id = data.get('msg_id')
     conversation_id = data.get('conversation_id')
     message = data.get('message')
     agent = data.get('agent')
     username = data.get('username')
-    msg_in_id = str(msg_id) + "|" + str(conversation_id)
 
     # Encontrar na fila de espera
-    if msg_in_id in waiting_for_global_queue:
-        waiting_for_global_queue.remove(msg_in_id)
+    if msg_id in waiting_for_global_queue:
+        print("Message found in waiting queue")
+        waiting_for_global_queue.remove(msg_id)
         try:
-            personal_info, last_10_msgs = db.get_data_for_question(username, conversation_id)
+            print("Username:", username)
+            print("Conversation ID:", conversation_id)
+            personal_info, last_10_msgs = db.get_data_for_question(str(username), str(conversation_id))
             if agent == "nutrition":
                 route = api_agent_port + 1
             elif agent == "supplements":
@@ -101,17 +103,21 @@ def global_agent_response(message_id):
                 "conversation_id": conversation_id,
                 "username": username,
                 "prompt": message,
-                "personal_info": personal_info,
-                "conversation": last_10_msgs
+                "user": {
+                    "personal_info": personal_info,
+                    "conversation": last_10_msgs
+                }
             }
 
             response = requests.post(route, json=to_ask, headers=headers)
 
             return jsonify({'message': 'Message added'}), 200
         except ValueError as e:
+            print("Error while processing global agent response:", str(e))
             return jsonify({'error': str(e)}), 404
 
     else:
+        print("Message not found in waiting queue")
         return jsonify({'error': 'Message not found in waiting queue'}), 404
     
 
@@ -144,9 +150,10 @@ def add_message(username, conversation_id):
                 'Content-Type': 'application/json'
             }
 
-            response = requests.post(route, json=to_find_llm, headers=headers)
+            waiting_for_global_queue.append(str(msg_id))
+            print(waiting_for_global_queue)
 
-            waiting_for_global_queue.append(msg_id + ";" + conversation_id)
+            response = requests.post(route, json=to_find_llm, headers=headers)
 
             if response.status_code == 200:
                 return jsonify({'message': 'Message added', 'conversation': updated_conversation}), 200

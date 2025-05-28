@@ -62,7 +62,9 @@ Topic:"""
             str: The agent type (nutrition, supplements, exercise, habits, or monitoring)
         """
         classification_prompt = self.create_classification_prompt(message)
+        print("Classification Prompt")
         llm_response = self.llm_client.generateResponse(classification_prompt)
+        print(f"LLM Response: {llm_response}")
         
         # Extract the agent from the response and ensure it's valid
         agent = llm_response.strip().lower()

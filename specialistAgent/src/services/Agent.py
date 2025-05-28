@@ -20,7 +20,7 @@ class Agent:
             raise ValueError(f"Missing environment variable: Group_{groupNumber}-TOGETHER_AI_API_KEY")
         
                 
-        self.globalOrchestratorPartialEndpoint = "http://localhost:5000/chat" 
+        self.globalOrchestratorPartialEndpoint = "http://localhost:4000/chat" 
         self.groupConfig = loadGroupConfig("src/config/groupConfig.json", f"Group_{groupNumber}")
         self.contextPrompt = loadInitialPrompt(self.groupConfig["contextPrompt"])
                     
@@ -50,14 +50,16 @@ class Agent:
                 print(f"[Worker] Response for {conversation_id}-{username}: {response}")
                 
                 sendWebhook(f"{self.globalOrchestratorPartialEndpoint}/{username}/{conversation_id}", {
-                    "message": response
+                    "message": response,
+                    "role": "bot"
                 })
                 
             except Exception as error:
                 print(f"[Worker] Error handling request {conversation_id}-{username}: {error}")
                 
                 sendWebhook(f"{self.globalOrchestratorPartialEndpoint}/{username}/{conversation_id}", {
-                    "error": str(error)
+                    "error": str(error),
+                    "role": "bot"
                 })
                 
             finally:
