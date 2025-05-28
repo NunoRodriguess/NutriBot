@@ -286,6 +286,10 @@ class MongoDBConnection:
             last_10_messages = conversation["messages"]
             last_10_messages.pop(-1)
 
+        for l10m in last_10_messages:
+            l10m.pop("timestamp", None)
+            l10m.pop("id", None)
+
         personal_info = user.get("personal_info", {})
 
         return personal_info, last_10_messages
