@@ -71,6 +71,14 @@ def global_agent_response():
     message = data.get('message')
     agent = data.get('agent')
     username = data.get('username')
+    thumbnail = data.get('thumbnail', None)
+    
+    print("Received global agent response")
+    print("Message ID:", msg_id)
+    print("Conversation ID:", conversation_id)
+    print("Message:", message)
+    print("Agent:", agent)
+    print("Thumbnail:", thumbnail)
 
     # Encontrar na fila de espera
     if msg_id in waiting_for_global_queue:
@@ -149,7 +157,7 @@ def add_message(username, conversation_id):
                 "username": username,
                 "conversation_id": conversation_id
             }
-            route = global_agent+"/globalagent"
+            route = global_agent
 
             headers = {
                 'Content-Type': 'application/json'

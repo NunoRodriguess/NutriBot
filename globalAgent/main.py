@@ -12,5 +12,5 @@ CORS(app)
 app.register_blueprint(global_agent_bp)
 
 if __name__ == '__main__':
-    port = int(os.getenv('PORT', 3006))
-    app.run(port=port)
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
