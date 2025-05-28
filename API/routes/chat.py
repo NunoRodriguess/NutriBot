@@ -10,12 +10,9 @@ db = MongoDBConnection()
 waiting_for_global_queue = []
 
 load_dotenv()
-nutrition_api = str(os.getenv('NUTRITION_API'))
-supplements_api = str(os.getenv('SUPPLEMENTS_API'))
-physical_api = str(os.getenv('PHISICAL_API'))
-others_api = str(os.getenv('OTHERS_API'))
-checkup_api = str(os.getenv('CHECKUP_API'))
+api_agent_port = int(os.getenv('API_AGENT_PORT', 3000))
 global_agent = str(os.getenv('GLOBAL_AGENT'))
+is_local = True
 
 @chat_bp.route('/chat/<username>', methods=['GET'])
 def get_conversations(username):
@@ -82,27 +79,30 @@ def global_agent_response(message_id):
         try:
             personal_info, last_10_msgs = db.get_data_for_question(username, conversation_id)
             if agent == "nutrition":
-                route = nutrition_api
+                route = api_agent_port + 1
             elif agent == "supplements":
-                route = supplements_api
+                route = api_agent_port + 2
             elif agent == "exercise":
-                route = physical_api
+                route = api_agent_port + 3
             elif agent == "habits":
-                route = others_api
+                route = api_agent_port + 4
             elif agent == "monitoring":
-                route = checkup_api
+                route = api_agent_port + 5
 
 
             headers = {
                 'Content-Type': 'application/json'
             }
 
+            if is_local:
+                route = "http://localhost:" + str(route) + "/api/ask"
+
             to_ask = {
-                "id": conversation_id,
+                "conversation_id": conversation_id,
                 "username": username,
                 "prompt": message,
                 "personal_info": personal_info,
-                "last_10_msgs": last_10_msgs
+                "conversation": last_10_msgs
             }
 
             response = requests.post(route, json=to_ask, headers=headers)
