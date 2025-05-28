@@ -126,6 +126,11 @@ def global_agent_response():
 def add_message(username, conversation_id):
     data = request.get_json()
     message = data.get('message')
+
+    if not message:
+        error = data.get('error')
+        updated_conversation = db.add_message_to_conversation(username, conversation_id, msg_id, str(error), role)
+
     role = data.get('role')
     msg_id = str(uuid.uuid4()) + "|" + str(conversation_id)
 
