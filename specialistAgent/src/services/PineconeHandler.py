@@ -132,8 +132,8 @@ class PineconeHandler:
 
             matches = results.get("matches", [])
             if not matches:
-                print(f"No results at level {currentHierachyLevel}, stopping.")
-                break
+                print(f"No results at level {currentHierachyLevel}...")
+                continue
 
 
             # Evaluate each match
