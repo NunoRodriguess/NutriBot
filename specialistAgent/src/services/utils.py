@@ -61,11 +61,13 @@ def formatPrompt(contextPrompt, userPrompt, context, userInformation, userHistor
     if userHistory:
         prompt += "User History:\n"
         for message in userHistory:
-            prompt += f"{message['role']}: {message['text']}\n"
+            prompt += f"==== Message ====\n"
+            prompt += f"{message['role'].capitalize()}: {message['text']}\n\n"
         prompt += "\n"
     
     # Add the articles context last
-    prompt += f"Articles context:\n{context}"
+    if context:
+        prompt += f"Articles context:\n{context}"
 
     return prompt
 

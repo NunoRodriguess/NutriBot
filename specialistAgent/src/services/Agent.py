@@ -74,9 +74,6 @@ class Agent:
     def submitQuestion(self, prompt, user):
         # Retrieve relevant articles from Pinecone
         context = self.pineconeHandler.query(prompt)
-        if context == "":
-            raise Exception("The articles does not provide enough information to answer completely.")
-        
         userInformation = user["personal_info"]
         userHistory = user["conversation"]
         
