@@ -182,13 +182,12 @@ class PineconeHandler:
             responseBuilder += f"Text: {match['metadata'].get('text')}\n\n"
 
         # Print final results
-        print("\nFinal Top Matches:")
-        for match in finalResults:
-            print(f"Id: {match['id']}")
-            print(f"Score: {match['score']:.4f}")
-            print(f"Hierarchy: {match['metadata']['hierarchy']}")
-            print(f"Text: {match['metadata']['text']}")
-            print("-" * 50)
+        if finalResults:
+            print("\nFinal Top Matches:")
+            for match in finalResults:
+                print(f"Id:{match['id']}, Score:{match['score']:.4f}")
+        else:
+            print("No matches found.")
 
         return responseBuilder
         
