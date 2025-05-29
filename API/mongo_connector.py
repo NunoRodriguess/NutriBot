@@ -51,7 +51,7 @@ class MongoDBConnection:
             raise ValueError(f"User {username} already exists in the database.")
 
         else:
-            user_info = {"_id": username, "_email": email, "personal_info": [], "conversations": []}  # Set _id to username
+            user_info = {"_id": username, "_email": email, "personal_info": {}, "conversations": []}  # Set _id to username
             
             result = collection.insert_one(user_info)
             

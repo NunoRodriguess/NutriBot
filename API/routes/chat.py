@@ -80,6 +80,10 @@ def global_agent_response():
     print("Agent:", agent)
     print("Thumbnail:", thumbnail)
 
+    # If the thumbnail is not None, update the conversation thumbnail
+    if thumbnail is not None:
+        db.update_conversation_thumbnail(username, conversation_id, thumbnail)
+
     # Encontrar na fila de espera
     if msg_id in waiting_for_global_queue:
         print("Message found in waiting queue")
