@@ -1,3 +1,4 @@
+import sys
 import os
 from dotenv import load_dotenv
 from flask import Flask
@@ -21,6 +22,9 @@ def create_app():
     return app
 
 if __name__ == '__main__':
+
+    if(sys.argv):
+        groupNumber = int(sys.argv[1])
 
     app = create_app()
     
