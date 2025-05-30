@@ -1,3 +1,4 @@
+import sys
 import os
 from dotenv import load_dotenv
 from flask import Flask
@@ -22,10 +23,13 @@ def create_app():
 
 if __name__ == '__main__':
 
+    if(sys.argv):
+        groupNumber = int(sys.argv[1])
+
     app = create_app()
     
     # Group1 - Port 3001
     # Group2 - Port 3002 
     # .....
-    app.run(port=3000+groupNumber) 
+    app.run(host="0.0.0.0", port=3000+groupNumber) 
 

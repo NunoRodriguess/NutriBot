@@ -1,20 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { IUserInfo } from '~/models/model';
 
+const GATEWAY_URL = process.env.GATEWAY_URL;
+
 export async function PUT(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { username, profile } = body as { username: string; profile: IUserInfo };
 
-    if (!username || !profile) {
-      return NextResponse.json({ error: 'Missing username or profile' }, { status: 400 });
+    const { searchParams } = new URL(req.url);
+    const username = searchParams.get("username");
+    
+    // Get profile from request body
+    const body = await req.json();
+    const { profile } = body as { profile: IUserInfo };
+
+    if (!username) {
+      return NextResponse.json({ error: 'Missing username in query parameters' }, { status: 400 });
     }
 
-    // TODO: Add logic here to validate and update the user profile to the api
-    console.log('Received profile update for:', username);
-    console.log(profile);
+    if (!profile) {
+      return NextResponse.json({ error: 'Missing profile data' }, { status: 400 });
+    }
 
-    return NextResponse.json({ message: 'ok' }, { status: 200 });
+    const response = await fetch(`${GATEWAY_URL}/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username,
+        ...profile,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return NextResponse.json({ error: error.message || 'Failed to update profile' }, { status: response.status });
+    }
+
+    return NextResponse.json({ message: 'Profile updated successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error in PUT /api/profile:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -22,20 +45,25 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-    const mockProfile: IUserInfo = {
-      age: 24,
-      height: 1.8,
-      physical_activity: 'daily',
-      avg_sleep_hours: 8,
-      avg_working_hours: 6,
-      body_fat: 15,
-      smoking: 'never',
-      alcohol_consumption: 'occasionally',
-      diseases: ['Hypertension'],
-      medication: ['Lisinopril'],
-      allergies: ['Peanuts'],
-      diet: ['High protein'],
-    };
-  
-    return NextResponse.json({ profile: mockProfile }, { status: 200 });
+  try {
+    const { searchParams } = new URL(req.url);
+    const username = searchParams.get("username");
+
+    if (!username) {
+      return NextResponse.json({ error: 'Missing username' }, { status: 400 });
+    }
+
+    const response = await fetch(`${GATEWAY_URL}/profile/${username}`);
+
+    if (!response.ok) {
+      const error = await response.json();
+      return NextResponse.json({ error: error.message || 'Failed to fetch profile' }, { status: response.status });
+    }
+
+    const data = await response.json();
+    return NextResponse.json({ profile: data }, { status: 200 });
+  } catch (error) {
+    console.error('Error in GET /api/profile:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
+}

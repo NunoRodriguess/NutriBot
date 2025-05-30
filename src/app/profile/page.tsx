@@ -28,6 +28,7 @@ import {
 
 export default function ProfilePage() {
   const { user } = useUser()
+  const [profileLoaded, setProfileLoaded] = useState(false)
 
   const [age, setAge] = useState<string>("")
   const [weight, setWeight] = useState<string>("")
@@ -54,15 +55,32 @@ export default function ProfilePage() {
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false)
 
   const displayName = user?.fullName ?? user?.username ?? "Your Profile"
-
   useEffect(() => {
     const fetchProfile = async () => {
+      if (!user || !user.username) {
+        return;
+      }
+      const username = user.username ?? user.firstName;
+      if (!username) {
+        console.error("No username available");
+        console.log("Set to loaded ... no good")
+        setProfileLoaded(true); // Still set to true to stop loading
+        return;
+      }
       try {
-        const res = await fetch("/api/profile")
-        if (!res.ok) throw new Error("Failed to fetch profile")
-
+        console.log("Fetching the user with username: ",user.username)
+        const res = await fetch(`/api/profile?username=${encodeURIComponent(user.username)}`);
+        if (!res.ok) {
+          // Handle different status codes
+          if (res.status === 404) {
+            console.log("Profile not found - this might be a new user");
+            return; // Don't throw error for new users
+          }
+          throw new Error(`Failed to fetch profile: ${res.status}`);
+        }
         const data = await res.json()
-        const profile: IUserInfo = data.profile
+        console.log(data)
+        const profile: IUserInfo = data.profile.personal_info
 
         if (profile.age) setAge(profile.age.toString())
         if (profile.weight) setWeight(profile.weight.toString())
@@ -82,6 +100,9 @@ export default function ProfilePage() {
         if (profile.other) setOther(profile.other)
       } catch (err) {
         console.error("Error loading profile:", err)
+      } finally {
+        console.log("Set to loaded")
+        setProfileLoaded(true);
       }
     }
 
@@ -95,7 +116,7 @@ export default function ProfilePage() {
     } else {
       setBmi(null)
     }
-  }, [weight, height])
+  }, [user, weight, height])
 
   function capitalizeFirstLetter(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1)
@@ -134,13 +155,15 @@ export default function ProfilePage() {
     }
 
     try {
-      const res = await fetch("/api/profile", {
+      if (!user || !user.username) {
+        return;
+      }
+      const res = await fetch(`/api/profile?username=${encodeURIComponent(user.username)}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username,
           profile: profileData,
         }),
       })

@@ -20,7 +20,7 @@ export default function NotFound() {
 
         <div className="space-y-4">
           <Link
-            href="/home"
+            href="/"
             className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-[#008F8C] px-8 py-3 font-medium text-white transition-all hover:bg-[#008F8C]/90"
           >
             <span className="relative z-10 flex items-center">

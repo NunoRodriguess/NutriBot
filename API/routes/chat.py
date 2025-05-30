@@ -92,16 +92,27 @@ def global_agent_response():
             print("Username:", username)
             print("Conversation ID:", conversation_id)
             personal_info, last_10_msgs = db.get_data_for_question(str(username), str(conversation_id))
+            general_agent_fields = ["age", "weight", "height", "sex"]
+            nutrition_fields = general_agent_fields + ["allergies", "diet"]
+            supplements_fields = general_agent_fields + ["icm", "body_fat", "physical_activity", "medications", "allergies"]
+            exercise_fields = general_agent_fields + ["icm", "avg_sleep_hours", "smoking", "avg_working_hours"]
+            habits_fields = general_agent_fields + ["smoking", "avg_working_hours", "avg_sleep_hours"]
+            monitoring_fields = general_agent_fields + ["diseases", "medications", "allergies", "alcohol_consumption", "physical_activity"]
             if agent == "nutrition":
                 route = api_agent_port + 1
+                personal_info = {k: personal_info[k] for k in nutrition_fields if k in personal_info}
             elif agent == "supplements":
                 route = api_agent_port + 2
+                personal_info = {k: personal_info[k] for k in supplements_fields if k in personal_info}
             elif agent == "exercise":
                 route = api_agent_port + 3
+                personal_info = {k: personal_info[k] for k in exercise_fields if k in personal_info}
             elif agent == "habits":
                 route = api_agent_port + 4
+                personal_info = {k: personal_info[k] for k in habits_fields if k in personal_info}
             elif agent == "monitoring":
                 route = api_agent_port + 5
+                personal_info = {k: personal_info[k] for k in monitoring_fields if k in personal_info}
 
 
             headers = {
@@ -161,7 +172,7 @@ def add_message(username, conversation_id):
                 "username": username,
                 "conversation_id": conversation_id
             }
-            route = global_agent
+            route = global_agent + "/globalagent"
 
             headers = {
                 'Content-Type': 'application/json'

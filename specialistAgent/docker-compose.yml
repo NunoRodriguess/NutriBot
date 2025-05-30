@@ -1,12 +1,11 @@
 version: '3'
 
 services:
-  specialist-agent-group1:
+  group1-specialist-agent:
     build:
       context: .
       dockerfile: Dockerfile
-    image: specialist-agent:latest
-    container_name: specialist-agent-group1
+    container_name: group1-specialist-agent
     environment:
       - GROUP_NUMBER=1
       - FLASK_PORT=3001
@@ -15,15 +14,12 @@ services:
     volumes:
       - ./src/data:/app/src/data
       - ./src/config:/app/src/config
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
-
-  specialist-agent-group2:
+  group2-specialist-agent:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: specialist-agent-group2
+    container_name: group2-specialist-agent
     environment:
       - GROUP_NUMBER=2
       - FLASK_PORT=3002
@@ -32,15 +28,13 @@ services:
     volumes:
       - ./src/data:/app/src/data
       - ./src/config:/app/src/config
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
 
-  specialist-agent-group3:
+  group3-specialist-agent:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: specialist-agent-group3
+    container_name: group3-specialist-agent
     environment:
       - GROUP_NUMBER=3
       - FLASK_PORT=3003
@@ -49,15 +43,13 @@ services:
     volumes:
       - ./src/data:/app/src/data
       - ./src/config:/app/src/config
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
 
-  specialist-agent-group4:
+  group4-specialist-agent:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: specialist-agent-group4
+    container_name: group4-specialist-agent
     environment:
       - GROUP_NUMBER=4
       - FLASK_PORT=3004
@@ -66,15 +58,13 @@ services:
     volumes:
       - ./src/data:/app/src/data
       - ./src/config:/app/src/config
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
 
-  specialist-agent-group5:
+  group5-specialist-agent:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: specialist-agent-group5
+    container_name: group5-specialist-agent
     environment:
       - GROUP_NUMBER=5
       - FLASK_PORT=3005
@@ -83,5 +73,3 @@ services:
     volumes:
       - ./src/data:/app/src/data
       - ./src/config:/app/src/config
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
