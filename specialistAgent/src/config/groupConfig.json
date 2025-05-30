@@ -27,7 +27,7 @@
     "maxHierarchyLevel": 3
   },
   "Group_4": {
-    "reasoningModel": true,
+    "reasoningModel": false,
     "contextPrompt": "src/config/contextPrompt_4.txt",
     "chunkedData": "src/data/chunkedData.json",
     "topK": 5,
