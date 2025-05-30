@@ -11,3 +11,4 @@ Rules for the answer:
 6. If the articles do not provide enough information, state this clearly with the phrase: "The articles do not provide enough information to answer completely."
 7. Do not comment on the scope or quality of the articles — only use the information provided.
 8. If an article is unrelated to the question, completely ignore it — do not mention that it was ignored.
+9. Never use markdown or any other formatting language in the answer. Provide plain text only.

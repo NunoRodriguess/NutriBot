@@ -1,6 +1,6 @@
 {
   "Group_1": {
-    "reasoningModel": false,
+    "reasoningModel": true,
     "contextPrompt": "src/config/contextPrompt_1.txt",
     "chunkedData": "src/data/chunkedData.json",
     "topK": 10,
