@@ -31,5 +31,5 @@ if __name__ == '__main__':
     # Group1 - Port 3001
     # Group2 - Port 3002 
     # .....
-    app.run(port=3000+groupNumber) 
+    app.run(host="0.0.0.0", port=3000+groupNumber) 
 

@@ -7,7 +7,6 @@ def askQuestionToSpecialistAgent(app, prefix, specialistAgent):
     @app.route(f"{prefix}", methods=["POST"])
     def askQuestion():
         data = request.get_json()
-        print(data)
         conversation_id = data.get("conversation_id")
         username = data.get("username")
         user = data.get("user")
