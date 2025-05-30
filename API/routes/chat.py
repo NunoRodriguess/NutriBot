@@ -161,7 +161,7 @@ def add_message(username, conversation_id):
                 "username": username,
                 "conversation_id": conversation_id
             }
-            route = global_agent
+            route = global_agent + "/globalagent"
 
             headers = {
                 'Content-Type': 'application/json'

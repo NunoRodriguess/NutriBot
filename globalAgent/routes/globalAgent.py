@@ -20,7 +20,6 @@ classifier = AgentClassifier()
 @global_agent_bp.route('/globalagent', methods=['POST'])
 
 def route_message():
-
     data = request.get_json()
     
     if not data:

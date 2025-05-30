@@ -4,6 +4,7 @@ import { useUser } from "@clerk/nextjs"
 import { useState, useEffect } from "react"
 import type { IMessage, IConversation } from "~/models/model"
 import { Leaf, Send, Plus, MessageSquare, Sparkles, Clock, Search } from "lucide-react"
+import { send } from "process"
 
 export default function HomePage() {
   const { user, isLoaded } = useUser()
@@ -12,35 +13,35 @@ export default function HomePage() {
   const [activeConversation, setActiveConversation] = useState<IConversation | null>(null)
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
+  const [sending, setSending] = useState(false)
+
+  const fetchConversations = async () => {
+  try {
+    const username = user?.username
+    if (!username) {
+      console.error("Username is missing.")
+      return
+    }
+
+    const response = await fetch(`/api/conversations?username=${encodeURIComponent(username)}`)
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
+
+    const data = (await response.json()) as IConversation[]
+    setConversations(data)
+
+    const urlParams = new URLSearchParams(window.location.search)
+    const conversationId = urlParams.get("id")
+    const initialConversation = data.find((c) => c._id.toString() === conversationId) ?? data[0] ?? null
+    setActiveConversation(initialConversation)
+  } catch (error) {
+    console.error("Error fetching conversations:", error)
+  } finally {
+    setLoading(false)
+  }
+}
 
   useEffect(() => {
     if (!isLoaded) return
-
-    const fetchConversations = async () => {
-      try {
-        const username = user?.username
-        if (!username) {
-          console.error("Username is missing.")
-          return
-        }
-
-        const response = await fetch(`/api/conversations?username=${encodeURIComponent(username)}`)
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
-
-        const data = (await response.json()) as IConversation[]
-        setConversations(data)
-
-        const urlParams = new URLSearchParams(window.location.search)
-        const conversationId = urlParams.get("id")
-        const initialConversation = data.find((c) => c._id.toString() === conversationId) ?? data[0] ?? null
-        setActiveConversation(initialConversation)
-      } catch (error) {
-        console.error("Error fetching conversations:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchConversations().catch((error) => {
       console.error("Unhandled error in fetchConversations:", error)
     })
@@ -57,29 +58,95 @@ export default function HomePage() {
     )
   }
 
-  const handleSelectConversation = (conv: IConversation) => {
-    setActiveConversation(conv)
+const handleSelectConversation = async (conv: IConversation) => {
+  if (!user?.username) {
+    console.error("Username is missing.")
+    return
   }
+
+  try {
+    const response = await fetch(
+      `/api/conversations?conversationId=${conv._id}&username=${user.username}`
+    )
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch full conversation")
+    }
+
+    const data = await response.json()
+    const fullConversation: IConversation = data.conversation
+    
+    setActiveConversation({ ...fullConversation })
+  } catch (error) {
+    console.error("Error loading full conversation:", error)
+  }
+}
 
   const handleSendMessage = async () => {
-    if (!message.trim() || !activeConversation) return
+  if (!message.trim() || !activeConversation || !user?.username) return
 
-    const newMessage: IMessage = { role: "user", text: message }
-    setActiveConversation({
-      ...activeConversation,
-      messages: [...activeConversation.messages, newMessage],
-    })
-    setMessage("")
+  const toSend = message.trim()
+  const newUserMessage: IMessage = { role: "user", text: toSend }
+  const conversationId = activeConversation._id
 
-    try {
-      setTimeout(() => {
-        const botResponse: IMessage = { role: "bot", text: "This is a mock response." }
-        setActiveConversation((prev) => (prev ? { ...prev, messages: [...prev.messages, botResponse] } : prev))
-      }, 1000)
-    } catch (error) {
-      console.error("Error sending message:", error)
+  // Optimistically update the UI with a new object reference
+  setActiveConversation(prev => {
+    if (!prev) return prev
+    return {
+      ...prev,
+      messages: [...prev.messages, newUserMessage],
     }
+  })
+
+  setMessage("")
+
+  try {
+     setSending(true)
+    const response = await fetch("/api/conversations", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        conversationId,
+        username: user.username,
+        message: newUserMessage,
+      }),
+    })
+
+    if (!response.ok) throw new Error("Failed to send message")
+
+    const r = await response.json()
+    if (r.status != 200){
+      throw new Error("Problem to process response")
+    }
+    console.log("On While")
+    while(true) {
+      console.log("Requesting")
+      const response = await fetch(
+      `/api/conversations?conversationId=${conversationId}&username=${user.username}`
+    )
+    console.log("got Request")
+    if (!response.ok) {
+      continue;
+    }
+    console.log("checking data")
+    const data = await response.json()
+    const fullConversation: IConversation = data.conversation
+    if (fullConversation && fullConversation._id === conversationId && fullConversation.messages.length > activeConversation?.messages.length + 1) {
+      setActiveConversation({ ...fullConversation })
+      console.log("checked out!")
+      break;    
+    }else{
+      console.log("Going to sleep ...")
+      await new Promise(r => setTimeout(r, 2000));
+    }
+    }
+  } catch (error) {
+    console.log("Error sending message:", error)
+    console.error("Error sending message:", error)
+  } finally{
+    setSending(false)
   }
+}
 
   const handleNewConversation = async () => {
     try {
@@ -99,16 +166,16 @@ export default function HomePage() {
 
       // Add to the list
       setConversations((prev) => [newConversation, ...prev])
-      setActiveConversation(newConversation)
+      // setActiveConversation(newConversation)
+      fetchConversations()
     } catch (error) {
       console.error("Error creating new conversation:", error)
     }
   }
 
-  const filteredConversations = conversations.filter((conv) =>
-    (conv.thumbnail || "Conversation").toLowerCase().includes(searchTerm.toLowerCase()),
-  )
-
+  const filteredConversations = (conversations || []).filter((conv) =>
+    conv && (conv.thumbnail || "Conversation").toLowerCase().includes(searchTerm.toLowerCase())
+  );
   return (
     <div className="flex h-screen bg-[#023535] text-[#D8FFDB]">
       {/* Sidebar */}
@@ -231,7 +298,7 @@ export default function HomePage() {
                   </div>
                 ) : (
                   activeConversation.messages.map((msg, index) => (
-                    <div key={index} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                    <div key={`${activeConversation._id}-${index}-${msg.text.substring(0, 10)}`} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                       <div
                         className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                           msg.role === "user" ? "bg-[#008F8C] text-white" : "bg-[#015958] text-[#D8FFDB]"
@@ -241,6 +308,17 @@ export default function HomePage() {
                       </div>
                     </div>
                   ))
+                )}
+                {sending && (
+                  <div className="flex justify-start">
+                    <div className="max-w-[80%] rounded-2xl bg-[#015958] px-4 py-3 text-[#D8FFDB]">
+                      <div className="flex items-center space-x-1">
+                        <div className="h-2 w-2 animate-bounce rounded-full bg-[#C7FFED] [animation-delay:-0.3s]"></div>
+                        <div className="h-2 w-2 animate-bounce rounded-full bg-[#C7FFED] [animation-delay:-0.15s]"></div>
+                        <div className="h-2 w-2 animate-bounce rounded-full bg-[#C7FFED]"></div>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -254,13 +332,14 @@ export default function HomePage() {
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                   placeholder="Type your message..."
-                  className="flex-1 bg-transparent px-4 py-3 text-[#D8FFDB] placeholder-[#D8FFDB]/50 focus:outline-none"
+                  disabled={sending}
+                  className="flex-1 bg-transparent px-4 py-3 text-[#D8FFDB] placeholder-[#D8FFDB]/50 focus:outline-none disabled:opacity-50"
                 />
                 <button
                   onClick={handleSendMessage}
-                  disabled={!message.trim()}
+                  disabled={!message.trim() || sending}
                   className={`mr-2 rounded-lg p-2 ${
-                    message.trim()
+                    message.trim() && !sending
                       ? "bg-[#008F8C] text-white hover:bg-[#008F8C]/80"
                       : "cursor-not-allowed bg-[#015958]/50 text-[#D8FFDB]/30"
                   }`}

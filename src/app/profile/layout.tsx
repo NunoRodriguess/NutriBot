@@ -11,13 +11,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body>
+    <html lang="en"
+      suppressHydrationWarning={true}
+     data-lt-installed="true">
+      <body>
+        <ClerkProvider>
           <Navbar />
           <main>{children}</main>
-        </body>
-      </html>
-    </ClerkProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   )
 }
