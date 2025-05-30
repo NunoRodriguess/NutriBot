@@ -26,9 +26,11 @@ class AgentClassifier:
             },
         }
 
+
+
+
     # --- THUMBNAIL GENERATION PROMPT ---
     def create_thumbnail_prompt(self, question):
-        # Create a prompt that instructs the LLM to generate a thumbnail
         prompt = f"""You are a system that generates a small summary (4-8 words) of a question, just like a typical chatbot would do to provide a thumbnail for the question.
 Question: {question}
 Instructions:
@@ -40,9 +42,6 @@ Summary:"""
         return prompt
     
 
-
-
-
     # --- CLASSIFICATION PROMPT FOR THE FIRST MESSAGE ---
     # This cannot provide None as an answer
     def create_classification_prompt_first_message(self, question):
@@ -52,7 +51,6 @@ Summary:"""
             for agent_id, data in self.agents.items()
         ])
         
-        # Create a prompt that instructs the LLM to classify the question
         prompt = f"""You are a classification system that determines which specialized agent should handle a given question.
 Available agents:
 {agents_list}
@@ -73,6 +71,7 @@ Topic:"""
 
 
     # --- CLASSIFICATION PROMPT FOR ALL BUT THE FIRST MESSAGE ---
+    # This one can provide None as an answer
     def create_classification_prompt(self, question):
         # List all available topics with descriptions
         agents_list = "\n".join([
@@ -80,7 +79,6 @@ Topic:"""
             for agent_id, data in self.agents.items()
         ])
         
-        # Create a prompt that instructs the LLM to classify the question
         prompt = f"""You are a classification system that determines which specialized agent should handle a given question.
 Available agents:
 {agents_list}
@@ -110,6 +108,7 @@ Topic:"""
             agent = llm_response_agent.strip().lower()
             if agent not in self.agents:
                 # Default to Nutrition Agent if the response is not valid - can't default to None on the first message
+                # (This shouldn't happen, but just in case the llm response is not valid)
                 agent = "nutrition"
 
             thumbnail_prompt = self.create_thumbnail_prompt(message)
@@ -123,20 +122,3 @@ Topic:"""
                 agent = "None"
             thumbnail = None
         return agent, thumbnail
-
-def main():
-    classifier = AgentClassifier()
-    
-    # Interactive test mode
-    while True:
-        question = input("\nAsk a question (or 'EXIT' to quit): ")
-        if question.strip().upper() == "EXIT":
-            break
-        
-        agent, thumbnail = classifier.classify_message(question)
-        print(f"Agent: {agent}")
-        if thumbnail:
-            print(f"Thumbnail: {thumbnail}")
-
-if __name__ == "__main__":
-    main()
