@@ -3,13 +3,22 @@
 import type React from "react"
 
 import { useUser, SignInButton } from "@clerk/nextjs"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Leaf } from "lucide-react"
 
 export default function LandingPage() {
   const { isSignedIn } = useUser()
   const router = useRouter()
+  type Bubble = {
+    size: string
+    distance: string
+    position: string
+    time: string
+    delay: string
+  }
+  const [bubbles, setBubbles] = useState<Bubble[]>([])
+  const [mounted, setMounted] = useState(false)
 
   // Redirect signed-in users to /home
   useEffect(() => {
@@ -18,25 +27,37 @@ export default function LandingPage() {
     }
   }, [isSignedIn, router])
 
+  // Generate bubbles only on client side to avoid hydration issues
+  useEffect(() => {
+    setMounted(true)
+    setBubbles(
+      Array.from({ length: 15 }).map(() => ({
+        size: `${2 + Math.random() * 4}rem`,
+        distance: `${6 + Math.random() * 4}rem`,
+        position: `${-5 + Math.random() * 110}%`,
+        time: `${2 + Math.random() * 2}s`,
+        delay: `${-1 * (2 + Math.random() * 2)}s`,
+      }))
+    )
+  }, [])
+
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-[#015958] to-[#023535]">
       {/* Animated background */}
       <div className="absolute inset-0 z-0">
         <div className="bubbles">
-          {Array.from({ length: 15 }).map((_, i) => (
+          {mounted && bubbles.map((bubble, i) => (
             <div
               key={i}
               className="bubble"
-              style={
-                {
-                  "--size": `${2 + Math.random() * 4}rem`,
-                  "--distance": `${6 + Math.random() * 4}rem`,
-                  "--position": `${-5 + Math.random() * 110}%`,
-                  "--time": `${2 + Math.random() * 2}s`,
-                  "--delay": `${-1 * (2 + Math.random() * 2)}s`,
-                } as React.CSSProperties
-              }
-            ></div>
+              style={{
+                "--size": bubble.size,
+                "--distance": bubble.distance,
+                "--position": bubble.position,
+                "--time": bubble.time,
+                "--delay": bubble.delay,
+              } as React.CSSProperties}
+            />
           ))}
         </div>
       </div>
@@ -129,4 +150,3 @@ export default function LandingPage() {
     </div>
   )
 }
-

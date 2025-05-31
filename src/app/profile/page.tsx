@@ -26,6 +26,14 @@ import {
   ChevronDown,
 } from "lucide-react"
 
+interface Particle {
+  width: number
+  height: number
+  top: number
+  left: number
+  opacity: number
+}
+
 export default function ProfilePage() {
   const { user } = useUser()
   const [profileLoaded, setProfileLoaded] = useState(false)
@@ -54,7 +62,24 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState<boolean>(false)
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false)
 
+  // State for background particles to prevent hydration mismatch
+  const [particles, setParticles] = useState<Particle[]>([])
+
   const displayName = user?.fullName ?? user?.username ?? "Your Profile"
+
+  // Generate particles on client side only
+  useEffect(() => {
+    const generatedParticles: Particle[] = Array.from({ length: 20 }).map(() => ({
+      width: Math.random() * 10 + 5,
+      height: Math.random() * 10 + 5,
+      top: Math.random() * 100,
+      left: Math.random() * 100,
+      opacity: Math.random() * 0.5 + 0.2,
+    }))
+    setParticles(generatedParticles)
+  }, [])
+
+  // Effect for fetching profile data (only depends on user)
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user || !user.username) {
@@ -68,7 +93,7 @@ export default function ProfilePage() {
         return;
       }
       try {
-        console.log("Fetching the user with username: ",user.username)
+        console.log("Fetching the user with username: ", user.username)
         const res = await fetch(`/api/profile?username=${encodeURIComponent(user.username)}`);
         if (!res.ok) {
           // Handle different status codes
@@ -107,7 +132,10 @@ export default function ProfilePage() {
     }
 
     fetchProfile()
+  }, [user]) // Only depends on user, not weight/height
 
+  // Separate effect for BMI calculation (only depends on weight and height)
+  useEffect(() => {
     const w = Number.parseFloat(weight)
     const h = Number.parseFloat(height)
     if (!isNaN(w) && !isNaN(h) && h > 0) {
@@ -116,7 +144,7 @@ export default function ProfilePage() {
     } else {
       setBmi(null)
     }
-  }, [user, weight, height])
+  }, [weight, height]) // Only depends on weight and height
 
   function capitalizeFirstLetter(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1)
@@ -194,16 +222,16 @@ export default function ProfilePage() {
       {/* Header */}
       <div className="relative mb-8 overflow-hidden bg-[#008F8C] py-12">
         <div className="absolute inset-0 opacity-10">
-          {Array.from({ length: 20 }).map((_, i) => (
+          {particles.map((particle, i) => (
             <div
               key={i}
               className="absolute rounded-full bg-white"
               style={{
-                width: `${Math.random() * 10 + 5}px`,
-                height: `${Math.random() * 10 + 5}px`,
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                opacity: Math.random() * 0.5 + 0.2,
+                width: `${particle.width}px`,
+                height: `${particle.height}px`,
+                top: `${particle.top}%`,
+                left: `${particle.left}%`,
+                opacity: particle.opacity,
               }}
             />
           ))}
@@ -254,6 +282,7 @@ export default function ProfilePage() {
                     onChange={setAge}
                     type="number"
                     icon={<Clock className="h-5 w-5 text-[#C7FFED]" />}
+                    disabled={!profileLoaded}
                   />
 
                   <div className="space-y-2">
@@ -265,7 +294,8 @@ export default function ProfilePage() {
                       <select
                         value={sex}
                         onChange={(e) => setSex(e.target.value)}
-                        className="w-full appearance-none rounded-lg border border-[#008F8C]/30 bg-[#015958]/30 px-4 py-3 pr-10 text-[#D8FFDB] focus:border-[#008F8C] focus:outline-none focus:ring-1 focus:ring-[#008F8C]"
+                        disabled={!profileLoaded}
+                        className="w-full appearance-none rounded-lg border border-[#008F8C]/30 bg-[#015958]/30 px-4 py-3 pr-10 text-[#D8FFDB] focus:border-[#008F8C] focus:outline-none focus:ring-1 focus:ring-[#008F8C] disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <option value="">Select (Optional)</option>
                         <option value="male">Male</option>
@@ -283,6 +313,7 @@ export default function ProfilePage() {
                     type="number"
                     step="0.1"
                     icon={<Activity className="h-5 w-5 text-[#C7FFED]" />}
+                    disabled={!profileLoaded}
                   />
 
                   <FormInput
@@ -292,6 +323,7 @@ export default function ProfilePage() {
                     type="number"
                     step="0.01"
                     icon={<ArrowRight className="h-5 w-5 text-[#C7FFED] rotate-90" />}
+                    disabled={!profileLoaded}
                   />
 
                   <FormInput
@@ -301,6 +333,7 @@ export default function ProfilePage() {
                     type="number"
                     step="0.1"
                     icon={<Droplet className="h-5 w-5 text-[#C7FFED]" />}
+                    disabled={!profileLoaded}
                   />
 
                   {/* BMI Card */}
@@ -346,6 +379,7 @@ export default function ProfilePage() {
                     type="number"
                     step="0.1"
                     icon={<Coffee className="h-5 w-5 text-[#C7FFED]" />}
+                    disabled={!profileLoaded}
                   />
 
                   <FormInput
@@ -355,6 +389,7 @@ export default function ProfilePage() {
                     type="number"
                     step="0.1"
                     icon={<Moon className="h-5 w-5 text-[#C7FFED]" />}
+                    disabled={!profileLoaded}
                   />
 
                   <FormSelect
@@ -362,6 +397,7 @@ export default function ProfilePage() {
                     value={physicalActivity}
                     onChange={setPhysicalActivity}
                     icon={<Activity className="h-5 w-5 text-[#C7FFED]" />}
+                    disabled={!profileLoaded}
                   />
 
                   <FormSelect
@@ -369,6 +405,7 @@ export default function ProfilePage() {
                     value={alcohol}
                     onChange={setAlcohol}
                     icon={<Wine className="h-5 w-5 text-[#C7FFED]" />}
+                    disabled={!profileLoaded}
                   />
 
                   <FormSelect
@@ -376,6 +413,7 @@ export default function ProfilePage() {
                     value={drugs}
                     onChange={setDrugs}
                     icon={<Pill className="h-5 w-5 text-[#C7FFED]" />}
+                    disabled={!profileLoaded}
                   />
 
                   <FormSelect
@@ -383,6 +421,7 @@ export default function ProfilePage() {
                     value={smoking}
                     onChange={setSmoking}
                     icon={<Cigarette className="h-5 w-5 text-[#C7FFED]" />}
+                    disabled={!profileLoaded}
                   />
                 </div>
               </div>
@@ -473,7 +512,8 @@ export default function ProfilePage() {
                   <textarea
                     value={other}
                     onChange={(e) => setOther(e.target.value)}
-                    className="w-full rounded-lg border border-[#008F8C]/30 bg-[#015958]/30 px-4 py-3 text-[#D8FFDB] placeholder-[#D8FFDB]/50 focus:border-[#008F8C] focus:outline-none focus:ring-1 focus:ring-[#008F8C]"
+                    disabled={!profileLoaded}
+                    className="w-full rounded-lg border border-[#008F8C]/30 bg-[#015958]/30 px-4 py-3 text-[#D8FFDB] placeholder-[#D8FFDB]/50 focus:border-[#008F8C] focus:outline-none focus:ring-1 focus:ring-[#008F8C] disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="Any other health information you'd like to share..."
                     rows={6}
                   />
@@ -486,7 +526,7 @@ export default function ProfilePage() {
               <div>{saveSuccess && <p className="text-sm text-[#C7FFED]">Profile saved successfully!</p>}</div>
               <button
                 onClick={handleSave}
-                disabled={isSaving}
+                disabled={isSaving || !profileLoaded}
                 className="flex items-center rounded-lg bg-[#008F8C] px-6 py-3 font-medium text-white transition-colors hover:bg-[#008F8C]/80 disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {isSaving ? (
@@ -516,6 +556,7 @@ function FormInput({
   type = "text",
   step,
   icon,
+  disabled = false,
 }: {
   label: string
   value: string
@@ -523,6 +564,7 @@ function FormInput({
   type?: string
   step?: string
   icon?: React.ReactNode
+  disabled?: boolean
 }) {
   return (
     <div className="space-y-2">
@@ -534,7 +576,8 @@ function FormInput({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-[#008F8C]/30 bg-[#015958]/30 px-4 py-3 text-[#D8FFDB] placeholder-[#D8FFDB]/50 focus:border-[#008F8C] focus:outline-none focus:ring-1 focus:ring-[#008F8C]"
+        disabled={disabled}
+        className="w-full rounded-lg border border-[#008F8C]/30 bg-[#015958]/30 px-4 py-3 text-[#D8FFDB] placeholder-[#D8FFDB]/50 focus:border-[#008F8C] focus:outline-none focus:ring-1 focus:ring-[#008F8C] disabled:opacity-50 disabled:cursor-not-allowed"
         placeholder="Optional"
         step={step}
       />
@@ -549,11 +592,13 @@ function FormSelect({
   value,
   onChange,
   icon,
+  disabled = false,
 }: {
   label: string
   value: string
   onChange: (val: string) => void
   icon?: React.ReactNode
+  disabled?: boolean
 }) {
   return (
     <div className="space-y-2">
@@ -565,7 +610,8 @@ function FormSelect({
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full appearance-none rounded-lg border border-[#008F8C]/30 bg-[#015958]/30 px-4 py-3 pr-10 text-[#D8FFDB] focus:border-[#008F8C] focus:outline-none focus:ring-1 focus:ring-[#008F8C]"
+          disabled={disabled}
+          className="w-full appearance-none rounded-lg border border-[#008F8C]/30 bg-[#015958]/30 px-4 py-3 pr-10 text-[#D8FFDB] focus:border-[#008F8C] focus:outline-none focus:ring-1 focus:ring-[#008F8C] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <option value="">Select (Optional)</option>
           {CATEGORY_OPTIONS.map((option) => (
