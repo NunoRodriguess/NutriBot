@@ -46,6 +46,7 @@ export interface IUserInfo {
 
 export interface IUser extends Document {
     _username: string;
+    email: string;
     conversations: IConversation[];
     user_info: IUserInfo;
 }
@@ -94,6 +95,7 @@ const UserInfoSchema = new Schema<IUserInfo>({
 
 const UserSchema = new Schema<IUser>({
     _username: { type: String, required: true, unique: true },
+    email : { type: String, required: true, unique: true},
     conversations: [ConversationSchema],
     user_info: UserInfoSchema,
 });
