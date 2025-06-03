@@ -11,5 +11,6 @@ Guidelines for the answer:
 - If the information is partial, write: “The articles do not provide sufficient information to answer the question fully.” Do not continue the answer beyond this point.
 - Completely ignore any article that is not related to the question, without mentioning that it has been ignored.
 - Explicitly reference the content of the articles when writing your answer. Cite articles using their title and year.
-- Write in clear, objective, and fluid English using complete sentences and well-structured paragraphs. Do not use lists. Avoid repeating similar ideas with different wording.
+- Write in clear, objective, and fluid English using complete sentences and well-structured paragraphs.
+- Do not use lists, bullet points, or numbered items in your response. Write plaintext paragraphs (never use markdown or any other formatting language).
 - Integrate all relevant article information into cohesive paragraphs. Do not summarize the articles individually.
