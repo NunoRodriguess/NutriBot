@@ -5,6 +5,8 @@ import { useState, useEffect } from "react"
 import type { IMessage, IConversation } from "~/models/model"
 import { Leaf, Send, Plus, MessageSquare, Sparkles, Clock, Search } from "lucide-react"
 import { send } from "process"
+import { Trash } from "lucide-react"
+
 
 export default function HomePage() {
   const { user, isLoaded } = useUser()
@@ -82,7 +84,7 @@ const handleSelectConversation = async (conv: IConversation) => {
   }
 }
 
-  const handleSendMessage = async () => {
+const handleSendMessage = async () => {
   if (!message.trim() || !activeConversation || !user?.username) return
 
   const toSend = message.trim()
@@ -148,34 +150,63 @@ const handleSelectConversation = async (conv: IConversation) => {
   }
 }
 
-  const handleNewConversation = async () => {
-    try {
-      const username = user?.username
-      if (!username) {
-        console.error("Username is missing.")
-        return
-      }
-      const response = await fetch("/api/conversations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: user?.username }),
-      })
-
-      const data = await response.json()
-      const newConversation: IConversation = data.conversation
-
-      // Add to the list
-      setConversations((prev) => [newConversation, ...prev])
-      // setActiveConversation(newConversation)
-      fetchConversations()
-    } catch (error) {
-      console.error("Error creating new conversation:", error)
+const handleNewConversation = async () => {
+  try {
+    const username = user?.username
+    if (!username) {
+      console.error("Username is missing.")
+      return
     }
-  }
+    const response = await fetch("/api/conversations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: user?.username }),
+    })
 
-  const filteredConversations = (conversations || []).filter((conv) =>
-    conv && (conv.thumbnail || "Conversation").toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    const data = await response.json()
+    const newConversation: IConversation = data.conversation
+
+    // Add to the list
+    setConversations((prev) => [newConversation, ...prev])
+    // setActiveConversation(newConversation)
+    fetchConversations()
+  } catch (error) {
+    console.error("Error creating new conversation:", error)
+  }
+}
+
+const handleDeleteConversation = async (conv: IConversation) => {
+  if (!user?.username) {
+    console.error("Username is missing.")
+    return
+  }
+  try {
+  const response = await fetch(
+    `/api/conversations?conversationId=${conv._id}&username=${user.username}`,
+    {
+      method: "DELETE",
+    }
+  )
+
+
+    if (!response.ok) {
+      throw new Error("Failed to delete conversation")
+    }
+
+    // pop the conversation from the list
+    setConversations((prev) => prev.filter((c) => c._id !== conv._id))
+    if (activeConversation?._id === conv._id) {
+      setActiveConversation(null)
+    }
+    await fetchConversations() // Refresh conversations list
+  } catch (error) {
+    console.error("Error deleting  conversation:", error)
+  }
+}
+
+const filteredConversations = (conversations || []).filter((conv) =>
+  conv && (conv.thumbnail || "Conversation").toLowerCase().includes(searchTerm.toLowerCase())
+);
   return (
     <div className="flex h-screen bg-[#023535] text-[#D8FFDB]">
       {/* Sidebar */}
@@ -212,10 +243,10 @@ const handleSelectConversation = async (conv: IConversation) => {
             {filteredConversations.length > 0 ? (
               <div className="space-y-2">
                 {filteredConversations.map((conv) => (
-                  <button
+                  <div
                     key={conv._id.toString()}
                     onClick={() => handleSelectConversation(conv)}
-                    className={`group flex w-full items-center rounded-lg p-3 text-left transition ${
+                    className={`group flex w-full items-center rounded-lg p-3 text-left transition cursor-pointer ${
                       activeConversation?._id === conv._id
                         ? "bg-[#008F8C] text-white"
                         : "text-[#D8FFDB] hover:bg-[#015958]/70"
@@ -231,8 +262,14 @@ const handleSelectConversation = async (conv: IConversation) => {
                           : "No messages yet"}
                       </p>
                     </div>
-                    <span className="ml-2 text-xs opacity-50">{new Date(conv.created_at).toLocaleDateString()}</span>
-                  </button>
+                    <button
+                      onClick={(e) => handleDeleteConversation(conv)}
+                      className="ml-2 rounded p-1 text-[#D8FFDB]/50 hover:text-red-500 hover:bg-[#008F8C]/10"
+                      aria-label="Delete conversation"
+                    >
+                        <Trash className="h-4 w-4" />
+                    </button>
+                  </div>
                 ))}
               </div>
             ) : (

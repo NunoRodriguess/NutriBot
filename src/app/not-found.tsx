@@ -1,8 +1,28 @@
+'use client'
+
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowLeft, Leaf } from "lucide-react"
 import "~/styles/globals.css"
 
 export default function NotFound() {
+  const [bubbles, setBubbles] = useState<{ style: React.CSSProperties }[]>([])
+
+  useEffect(() => {
+    const generated = Array.from({ length: 20 }).map(() => ({
+      style: {
+        width: `${Math.random() * 300 + 50}px`,
+        height: `${Math.random() * 300 + 50}px`,
+        top: `${Math.random() * 100}%`,
+        left: `${Math.random() * 100}%`,
+        animationDuration: `${Math.random() * 10 + 10}s`,
+        animationDelay: `${Math.random() * 5}s`,
+        animation: "float infinite ease-in-out",
+      },
+    }))
+    setBubbles(generated)
+  }, [])
+
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-[#023535] to-[#015958]">
       <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
@@ -34,19 +54,11 @@ export default function NotFound() {
 
       {/* Animated background elements */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        {Array.from({ length: 20 }).map((_, i) => (
+        {bubbles.map((bubble, i) => (
           <div
             key={i}
             className="absolute rounded-full bg-[#008F8C]/10"
-            style={{
-              width: `${Math.random() * 300 + 50}px`,
-              height: `${Math.random() * 300 + 50}px`,
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animationDuration: `${Math.random() * 10 + 10}s`,
-              animationDelay: `${Math.random() * 5}s`,
-              animation: "float infinite ease-in-out",
-            }}
+            style={bubble.style}
           />
         ))}
       </div>

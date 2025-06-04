@@ -124,3 +124,36 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
+
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const username = searchParams.get("username")
+    const conversationId = searchParams.get("conversationId")
+
+    if (!username) {
+      return NextResponse.json({ error: "Username is required" }, { status: 400 })
+    }
+
+   
+    if (conversationId) {
+      const gatewayRes = await fetch(`${GATEWAY_URL}/chat/${username}/${conversationId}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        }
+      )
+      if (!gatewayRes.ok) {
+        const errorText = await gatewayRes.text()
+        console.error("Gateway error:", errorText)
+        return NextResponse.json({ error: "Failed to delete conversation" }, { status: 502 })
+      }
+
+      return NextResponse.json({ status: 200 })
+    }
+  } catch (error) {
+    console.error("Error Deleting", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
+}
