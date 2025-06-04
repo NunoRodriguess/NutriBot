@@ -30,6 +30,14 @@ def get_conversation(username, conversation_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
 
+@chat_bp.route('/chat/<username>/<conversation_id>', methods=['DELETE'])
+def delete_conversation(username, conversation_id):
+    try:
+        db.delete_conversation(username, conversation_id)
+        return jsonify({'message': f'Conversation {conversation_id} deleted successfully for user {username}'}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 404
+
 @chat_bp.route('/chat', methods=['POST'])
 def create_conversation():
     data = request.get_json()

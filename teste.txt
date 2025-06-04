@@ -1,0 +1,10 @@
+
+> nutri-bot-um@0.1.0 build
+> next build
+
+   ▲ Next.js 15.3.0
+   - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 1000ms
+   Linting and checking validity of types ...

@@ -148,6 +148,34 @@ class MongoDBConnection:
             return conversation
         else:
             raise ValueError(f"Failed to create conversation for user {username}.")
+        
+    def delete_conversation(self, username, conversation_id, collection_name="users"):
+        """
+        Delete a specific conversation by ID for a given username.
+
+        :param username: The username of the user.
+        :param conversation_id: The ID of the conversation to delete.
+        :param collection_name: The name of the MongoDB collection (default is "users").
+        :return: None
+        :raises ValueError: If the user or conversation is not found.
+        """
+        collection = self.db[collection_name]
+
+        user = collection.find_one({"_id": username}, {"conversations": 1})
+
+        if not user:
+            raise ValueError(f"User {username} not found in the database.")
+
+        conversations = user.get("conversations", [])
+        updated_conversations = [c for c in conversations if c.get("id") != conversation_id]
+
+        if len(updated_conversations) == len(conversations):
+            raise ValueError(f"Conversation {conversation_id} not found for user {username}.")
+
+        collection.update_one(
+            {"_id": username},
+            {"$set": {"conversations": updated_conversations}}
+        )
 
     def add_message_to_conversation(self, username, conversation_id, msg_id, message, role, collection_name="users"):
         """
