@@ -1,12 +1,67 @@
-version: '3.8'
 services:
-  nextjs:
-    build: .
+  agent1:
+    build: specialistAgent/
     env_file: .env
-    ports:
-      - "3000:3000"
     environment:
-      - NODE_ENV=production
-    volumes:
-      - .:/app
-      - /app/node_modules
+      - GATEWAY_URL=http://gateway:4000
+    ports:
+      - "3001:3001"
+    command: ["python", "src/app.py", "1"]
+  agent2:
+    build: specialistAgent/
+    env_file: .env
+    environment:
+      - GATEWAY_URL=http://gateway:4000
+    ports:
+      - "3002:3002"
+    command: ["python", "src/app.py", "2"]
+  agent3:
+    build: specialistAgent/
+    env_file: .env
+    environment:
+      - GATEWAY_URL=http://gateway:4000
+    ports:
+      - "3003:3003"
+    command: ["python", "src/app.py", "3"]
+  agent4:
+    build: specialistAgent/
+    env_file: .env
+    environment:
+      - GATEWAY_URL=http://gateway:4000
+    ports:
+      - "3004:3004"
+    command: ["python", "src/app.py", "4"]
+  agent5:
+    build: specialistAgent/
+    env_file: .env
+    environment:
+      - GATEWAY_URL=http://gateway:4000
+    ports:
+      - "3005:3005"
+    command: ["python", "src/app.py", "5"]
+  global-agent:
+    build: globalAgent/
+    env_file: .env
+    environment:
+      - API_URL=http://gateway:4000/globalresponse
+      - MONGO_URI=mongodb://database:27017
+    ports:
+      - "5001:5001"
+    command: ["python", "main.py"]
+
+  gateway:
+    build: API/
+    env_file: .env
+    environment:
+      - MONGO_URI=mongodb://database:27017
+      - GLOBAL_AGENT=http://global-agent:5001
+      - AGENT_HOST=http://agent1:3001,http://agent2:3002,http://agent3:3003,http://agent4:3004,http://agent5:3005
+    ports:
+      - "4000:4000"
+    command: ["python", "main.py"]
+
+  database:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"

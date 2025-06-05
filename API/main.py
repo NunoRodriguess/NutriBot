@@ -15,4 +15,4 @@ app.register_blueprint(chat_bp)
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 3001))
-    app.run(port=port)
+    app.run(host='0.0.0.0',port=port)

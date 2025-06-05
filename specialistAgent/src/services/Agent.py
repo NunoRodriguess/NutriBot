@@ -13,6 +13,7 @@ class Agent:
         
         PINECONE_API_KEY = os.getenv(f"Group_{groupNumber}-PINECONE_API_KEY")
         TOGETHER_AI_API_KEY = os.getenv(f"Group_{groupNumber}-TOGETHER_AI_API_KEY")
+        GATEWAY_URL = os.getenv("GATEWAY_URL", "http://localhost:4000")
         if not PINECONE_API_KEY:
             raise ValueError(f"Missing environment variable: Group_{groupNumber}-PINECONE_API_KEY")
 
@@ -20,7 +21,7 @@ class Agent:
             raise ValueError(f"Missing environment variable: Group_{groupNumber}-TOGETHER_AI_API_KEY")
         
                 
-        self.globalOrchestratorPartialEndpoint = "http://localhost:4000/chat" 
+        self.globalOrchestratorPartialEndpoint = GATEWAY_URL + "/chat" 
         self.groupConfig = loadGroupConfig("src/config/groupConfig.json", f"Group_{groupNumber}")
         self.contextPrompt = loadInitialPrompt(self.groupConfig["contextPrompt"])
                     

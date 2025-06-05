@@ -12,6 +12,13 @@ waiting_for_global_queue = []
 load_dotenv()
 api_agent_port = int(os.getenv('API_AGENT_PORT', 3000))
 global_agent = str(os.getenv('GLOBAL_AGENT'))
+
+def get_agent_url(agent_number):
+    agent_hosts = os.getenv('AGENT_HOST', '').split(',')
+    if agent_number <= len(agent_hosts) and agent_number > 0:
+        return agent_hosts[agent_number - 1].strip()
+    return f"http://localhost:300{agent_number}"  # fallback
+
 is_local = True
 
 @chat_bp.route('/chat/<username>', methods=['GET'])
@@ -107,28 +114,27 @@ def global_agent_response():
             habits_fields = general_agent_fields + ["smoking", "avg_working_hours", "avg_sleep_hours"]
             monitoring_fields = general_agent_fields + ["diseases", "medications", "allergies", "alcohol_consumption", "physical_activity"]
             if agent == "nutrition":
-                route = api_agent_port + 1
+                route = get_agent_url(1)
                 personal_info = {k: personal_info[k] for k in nutrition_fields if k in personal_info}
             elif agent == "supplements":
-                route = api_agent_port + 2
+                route = get_agent_url(2)
                 personal_info = {k: personal_info[k] for k in supplements_fields if k in personal_info}
             elif agent == "exercise":
-                route = api_agent_port + 3
+                route = get_agent_url(3)
                 personal_info = {k: personal_info[k] for k in exercise_fields if k in personal_info}
             elif agent == "habits":
-                route = api_agent_port + 4
+                route = get_agent_url(4)
                 personal_info = {k: personal_info[k] for k in habits_fields if k in personal_info}
             elif agent == "monitoring":
-                route = api_agent_port + 5
+                route = get_agent_url(5)
                 personal_info = {k: personal_info[k] for k in monitoring_fields if k in personal_info}
 
 
             headers = {
                 'Content-Type': 'application/json'
             }
-
             if is_local:
-                route = "http://localhost:" + str(route) + "/api/ask"
+                route = str(route) + "/api/ask"
 
             to_ask = {
                 "conversation_id": conversation_id,
