@@ -14,7 +14,7 @@
     "chunkedData": "src/data/chunkedData.json",
     "topK": 5,
     "targetThreshold": 0.5,
-    "minimumThreshold": 0.22,
+    "minimumThreshold": 0.25,
     "maxHierarchyLevel": 2
   },
   "Group_3": {
