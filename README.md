@@ -27,9 +27,11 @@ TBD
 
 ## Repositórios
 
+Role C: https://github.com/SenseiBott/NutriBot-KnowledgeBase
+
 Grupo 1: https://github.com/kikofallout/MD-Grupo1
 
-Grupo 2: https://github.com/SenseiBott/NutriBot-KnowledgeBase
+Grupo 2: [https://github.com/SenseiBott/NutriBot-KnowledgeBase](https://github.com/SenseiBott/NutriBot-KnowledgeBase)
 
 Grupo 3: https://github.com/Goncalini/Chatbot-de-Atividade-Fisica
 
