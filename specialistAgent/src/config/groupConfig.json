@@ -4,9 +4,9 @@
     "contextPrompt": "src/config/contextPrompt_1.txt",
     "chunkedData": "src/data/chunkedData.json",
     "topK": 10,
-    "targetThreshold": 0.6,
-    "minimumThreshold": 0.2,
-    "maxHierarchyLevel": 4
+    "targetThreshold": 0.5,
+    "minimumThreshold": 0.3,
+    "maxHierarchyLevel": 3
   },
   "Group_2": {
     "reasoningModel": false,
