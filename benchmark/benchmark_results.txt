@@ -1,0 +1,98 @@
+Successfully loaded 100 records from benchmark.csv
+
+Dataset Overview:
+Total questions: 100
+Columns: ['question', 'expected_agent', 'selected_agent', 'response', 'llb_evaluation']
+
+==================================================
+GLOBAL AGENT ANALYSIS
+==================================================
+Correctly sent to right agent: 96
+Sent to wrong agent: 4
+Success rate: 96.00%
+
+Routing Breakdown:
+selected_agent   1   2   3   4   5  Total
+expected_agent                           
+1               20   0   0   0   0     20
+2                0  20   0   0   0     20
+3                0   0  20   0   0     20
+4                0   0   0  20   0     20
+5                0   0   0   4  16     20
+Total           20  20  20  24  16    100
+
+==================================================
+INDIVIDUAL AGENT ANALYSIS
+==================================================
+
+Agent 1:
+  Total responses handled: 20
+  Correctly selected: 20
+  Accuracy when selected: 100.00%
+  Average LLB rating: 8.00
+  Highest rating: 9.0
+  Lowest rating: 3.0
+
+Agent 2:
+  Total responses handled: 20
+  Correctly selected: 20
+  Accuracy when selected: 100.00%
+  Average LLB rating: 8.12
+  Highest rating: 9.0
+  Lowest rating: 7.0
+
+Agent 3:
+  Total responses handled: 20
+  Correctly selected: 20
+  Accuracy when selected: 100.00%
+  Average LLB rating: 8.57
+  Highest rating: 9.5
+  Lowest rating: 6.0
+
+Agent 4:
+  Total responses handled: 24
+  Correctly selected: 20
+  Accuracy when selected: 83.33%
+  Average LLB rating: 7.90
+  Highest rating: 9.5
+  Lowest rating: 6.0
+
+Agent 5:
+  Total responses handled: 16
+  Correctly selected: 16
+  Accuracy when selected: 100.00%
+  Average LLB rating: 8.78
+  Highest rating: 10.0
+  Lowest rating: 6.5
+
+==================================================
+OVERALL STATISTICS
+==================================================
+Overall average LLB rating: 8.24
+Overall highest rating: 10.0
+Overall lowest rating: 3.0
+Rating standard deviation: 1.21
+
+==================================================
+INCORRECTLY ROUTED QUESTIONS
+==================================================
+
+Question: What lifestyle changes can I make to prevent chronic diseases?...
+Expected Agent: 5
+Selected Agent: 4
+LLB Rating: 9.5
+
+Question: How does lifestyle counseling benefit mental and physical health?...
+Expected Agent: 5
+Selected Agent: 4
+LLB Rating: 9.0
+
+Question: How can obesity prevention strategies be integrated into daily life?...
+Expected Agent: 5
+Selected Agent: 4
+LLB Rating: 8.0
+
+Question: How does quitting smoking impact long-term health outcomes?...
+Expected Agent: 5
+Selected Agent: 4
+LLB Rating: 9.0
